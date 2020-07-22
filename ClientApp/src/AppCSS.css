@@ -1,0 +1,10 @@
+input.error {
+    border: 1px solid red;
+  }
+  
+  .errorMessage {
+    color: red;
+    font-size: 12px;
+    display: relative;
+    font-style: italic;
+  }
