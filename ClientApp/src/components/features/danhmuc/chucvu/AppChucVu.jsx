@@ -1,12 +1,42 @@
 import React, { Component } from 'react';
-import { Table } from 'react-bootstrap';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, ButtonGroup, Button } from '@material-ui/core'
+import EditIcon from "@material-ui/icons/Edit"
+import DeleteIcon from "@material-ui/icons/Delete"
+import { withStyles } from '@material-ui/core/styles'
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+
 import { AddChucVuModal } from './AddChucVuModal';
 import { EditChucVuModal } from './EditChucVuModal';
 
-export class AppChucVu extends Component {
-    //static displayName = AppPhongBan.name;
+const StyledTableCell = withStyles((theme) => ({
+    head: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+        fontSize: 17,
+    },
+    body: {
+        fontSize: 16,
+    },
+}))(TableCell);
 
+const StyledTableRow = withStyles((theme) => ({
+    root: {
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+    },
+}))(TableRow);
+
+const StyledTable = withStyles((theme) => ({
+    root: {
+        minWidth: 600,
+        //border:true
+    },
+}))(Table);
+
+
+
+export class AppChucVu extends Component {
 
     constructor(props) {
         super(props);
@@ -46,18 +76,18 @@ export class AppChucVu extends Component {
         //     alert('Không thể xóa vì còn nhân viên trong phòng ban này')
         // }
         // else {
-            if (window.confirm('Are your sure!')) {
-                fetch('https://localhost:44390/api/chucvus/' + idcv, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
+        if (window.confirm('Are your sure!')) {
+            fetch('https://localhost:44390/api/chucvus/' + idcv, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
 
-            }
+        }
         // }
-        
+
     }
 
     render() {
@@ -71,61 +101,86 @@ export class AppChucVu extends Component {
                     <h1 className="display-7">QUẢN LÝ CHỨC VỤ</h1><hr />
                 </div>
 
-                <ButtonToolbar>
+                <Button variant="contained"
+                    color="primary"
+                    //component="span"
+                    startIcon={<AddCircleOutlineIcon />}
+                    onClick={() => this.setState({ addModalShow: true })}>
+                    Thêm chức vụ
+                </Button>
+                <AddChucVuModal
+                    show={this.state.addModalShow}
+                    onHide={addModalClose}
+                />
+
+                {/* <ButtonToolbar>
                     <Button variant="primary" onClick={() => this.setState({ addModalShow: true })}
                     >Thêm Mới</Button>
-                </ButtonToolbar>
-                
-                <Table className="mt-4">
-                    <thead className="">
-                        <tr>
-                            <th>#</th>
-                            <th>Tên chức vụ</th>
-                            <th>Mô tả</th>
-                            <th>Chức năng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chucvus.map((cv, key) =>
-                            <tr key={cv.idchucVu}>
-                                <td>{key + 1}</td>
-                                <td>{cv.tenChucVu}</td>
-                                <td>{cv.moTa}</td>
-                                <td>
-                                    <ButtonToolbar>
-                                        <Button className="mr-2" variant="warning"
-                                            onClick={() => this.setState({
-                                                editModalShow: true,
-                                                cvid: cv.idchucVu,
-                                                cvten: cv.tenChucVu,
-                                                cvmota: cv.moTa,
-                                            })}
-                                        ><i className="ik ik-edit-2" />
-                                            Sửa </Button>
-                                        <Button className="mr-2" variant="danger"
-                                            onClick={() => this.xoaChucVu(cv.idchucVu)}
-                                        ><i className="ik ik-trash-2" />
-                                            Xóa</Button>                         
+                </ButtonToolbar> */}
+                <TableContainer>
+                    <StyledTable className="mt-3">
+                        <TableHead>
+                            <StyledTableRow>
+                                {/* <th>#</th> */}
+                                <StyledTableCell>Tên chức vụ</StyledTableCell>
+                                <StyledTableCell align="center">Mô tả</StyledTableCell>
+                                <StyledTableCell align="center">Chức năng</StyledTableCell>
+                            </StyledTableRow>
+                        </TableHead>
+                        <TableBody>
+                            {chucvus.map(cv =>
+                                <StyledTableRow>
+                                    {/* <td>{key + 1}</td> */}
+                                    <StyledTableCell>{cv.tenChucVu}</StyledTableCell>
+                                    <StyledTableCell align="center">{cv.moTa}</StyledTableCell>
+                                    <StyledTableCell align="center">
+                                        <ButtonGroup variant="text">
 
-                                        <EditChucVuModal
-                                            show={this.state.editModalShow}
-                                            onHide={editModalClose}
-                                            cvid={cvid}
-                                            cvten={cvten}
-                                            cvmota={cvmota}
-                                        />
-                                    </ButtonToolbar>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </Table>
-                <ButtonToolbar>
-                    <AddChucVuModal
-                        show={this.state.addModalShow}
-                        onHide={addModalClose}
-                    />
-                </ButtonToolbar>
+                                            <Button>
+                                                <EditIcon color="primary"
+                                                    onClick={() => this.setState({
+                                                        editModalShow: true,
+                                                        cvid: cv.idchucVu,
+                                                        cvten: cv.tenChucVu,
+                                                        cvmota: cv.moTa,
+                                                    })}
+                                                ></EditIcon>
+                                            </Button>
+
+                                            <Button>
+                                                <DeleteIcon color="secondary"
+                                                    onClick={() => this.xoaChucVu(cv.idchucVu)}
+                                                ></DeleteIcon>
+                                            </Button>
+
+                                            {/* <Button className="mr-2" variant="warning"
+                                                onClick={() => this.setState({
+                                                    editModalShow: true,
+                                                    cvid: cv.idchucVu,
+                                                    cvten: cv.tenChucVu,
+                                                    cvmota: cv.moTa,
+                                                })}
+                                            ><i className="ik ik-edit-2" />
+                                            Sửa </Button>
+                                            <Button className="mr-2" variant="danger"
+                                                onClick={() => this.xoaChucVu(cv.idchucVu)}
+                                            ><i className="ik ik-trash-2" />
+                                            Xóa</Button> */}
+
+                                            <EditChucVuModal
+                                                show={this.state.editModalShow}
+                                                onHide={editModalClose}
+                                                cvid={cvid}
+                                                cvten={cvten}
+                                                cvmota={cvmota}
+                                            />
+                                        </ButtonGroup>
+                                    </StyledTableCell>
+                                </StyledTableRow>
+                            )}
+                        </TableBody>
+                    </StyledTable>
+                </TableContainer>
             </div>
         )
     }

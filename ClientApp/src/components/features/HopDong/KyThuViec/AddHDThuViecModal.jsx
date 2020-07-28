@@ -1,9 +1,35 @@
 import React, { Component } from 'react';
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
+
+import axios from 'axios'
+import { Modal, Row, Col, Form } from 'react-bootstrap';
+import { Grid, TextField, Button, FormControl, InputLabel, Select, MenuItem, Input } from "@material-ui/core";
+import { withStyles } from '@material-ui/core/styles';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AppCSS from '../../../../AppCSS.css'
 import { format, compareAsc, addMonths } from 'date-fns'
 
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
+
+
+const StyledGioiTinh = withStyles((theme) => ({
+    root: {
+        minWidth: 120
+    },
+}))(TextField);
+
+const StyledNgay = withStyles((theme) => ({
+    root: {
+        width: 250
+    },
+}))(TextField);
+
+const StyledKeID = withStyles((theme) => ({
+    root: {
+        width: 255
+    },
+}))(TextField);
 
 export class AddHDThuViecModal extends Component {
     //static displayName = AddPhongbanModal.name;
@@ -13,7 +39,7 @@ export class AddHDThuViecModal extends Component {
 
         this.state = {
             hds: [],
-            HopdongBD: 'yyyy-MM-dd',
+            HopdongBD: '',
             snackbaropen: false,
             snackbarmsg: ''
         };
@@ -24,7 +50,7 @@ export class AddHDThuViecModal extends Component {
         this.setState({ snackbaropen: false });
     };
 
-    refreshLishHD() {
+    loadHD() {
         fetch('https://localhost:44390/api/hopdongs')
             .then(respone => respone.json())
             .then(data => {
@@ -33,31 +59,12 @@ export class AddHDThuViecModal extends Component {
     }
 
     componentDidMount() {
-        this.refreshLishHD()
+        this.loadHD()
     }
-
-    handleChange = (event) => {
-        const name = event.target.name;
-        const values = event.target.value;
-        //console.log("ban dau: " + name)
-        //console.log("value bd: " + values)
-
-        var tang2thang = addMonths(new Date(values), 2)
-        //console.log("tang 2 thang: " + tang2thang)
-
-        var result = format(new Date(tang2thang), 'yyyy-MM-dd')
-        //console.log("format lai: " + result)
-
-        this.setState({
-            HopdongBD: result
-        })
-
-    }
-
 
     handleSubmit(event) {
         event.preventDefault();
-        
+
         var ktKyVaBatDau = compareAsc(
             new Date(event.target.HopdongBD.value),
             new Date(event.target.HopdongKY.value)
@@ -74,75 +81,189 @@ export class AddHDThuViecModal extends Component {
         else if (ktKyVaBatDau == -1) {
             alert('Ngày chưa hợp lệ')
         } else {
-            fetch('https://localhost:44390/api/hopdongs', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ngayLapHd: event.target.HopdongKY.value,
-                    ngayBatDau: event.target.HopdongBD.value,
-                    ngayHetHan: event.target.HopdongKT.value,
-                    ghiChu: event.target.HopdongGHICHU.value,
-                    idloaiHd: 10,
-                    idnhanVien: parseInt(event.target.NhanvienID.value),
-                })
+            axios.post('https://localhost:44390/api/hopdongs', {
+                ngayLapHd: event.target.HopdongKY.value,
+                ngayBatDau: event.target.HopdongBD.value,
+                ngayHetHan: event.target.HopdongKT.value,
+                ghiChu: "Ký",
+                idloaiHd: 10,
+                idnhanVien: parseInt(event.target.NhanvienID.value),
             })
-                .then(res1 => res1.json())
-                .then((result1) => {
-                    //alert(result1);
-                }, () => {
-                    this.setState({ snackbaropen: true, snackbarmsg: 'Sửa thành công' })
-                })
-            fetch('https://localhost:44390/api/nhanviens/' + parseInt(event.target.NhanvienID.value), {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    idnhanVien: parseInt(event.target.NhanvienID.value),
-                    hoDem: this.props.nvho,
-                    ten: this.props.nvten,
-                    nguyenQuan: this.props.nvnguyenquan,
-                    tinhTrangHonNhan: this.props.nvtinhtranghonnhan,
-                    ngaySinh: this.props.nvngaysinh,
-                    noiSinh: this.props.nvnoisinh,
-                    gioiTinh: this.props.nvgioitinh,
-                    //hinhAnh
-                    diaChiThuongTru: this.props.nvdcthuongtru,
-                    choOhienTai: this.props.nvchohientai,
-                    soCmnn: this.props.nvsocmnd,
-                    ngayCap: this.props.nvngaycap,
-                    tonGiao: this.props.nvtongiao,
-                    noiCap: this.props.nvnoicap,
-                    quocTich: this.props.nvquoctich,
-                    email: this.props.nvmail,
-                    soDienThoai: this.props.nvsdt,
-                    nganhHoc: this.props.nvnganhhoc,
-                    noiDaoTao: this.props.nvnoidaotao,
-                    xepLoai: this.props.nvxeploai,
-                    //username
-                    idphongBan: this.props.nvpb,
-                    idchucVu: this.props.nvcv,
-                    //idquanHeGd
-                    trangthaiHdthuViec: "Đã ký",
-                    iddanToc: this.props.nvdantoc,
-                    idtrinhDo: this.props.nvdaotao,
-                    //idquyetDinhBn
-                    //nvdaotao: this.props.nvdaotao,
 
-
-                })
-            }).then(res => res.json())
-                .then((result) => {
-                    //alert(result);
-                }, () => {
-                    this.setState({ snackbaropen: true, snackbarmsg: 'Sửa thành công' })
-                })
+            axios.put('https://localhost:44390/api/nhanviens/' + parseInt(event.target.NhanvienID.value), {
+                idnhanVien: parseInt(event.target.NhanvienID.value),
+                hoDem: this.props.nvho,
+                ten: this.props.nvten,
+                nguyenQuan: this.props.nvnguyenquan,
+                tinhTrangHonNhan: this.props.nvtinhtranghonnhan,
+                ngaySinh: this.props.nvngaysinh,
+                noiSinh: this.props.nvnoisinh,
+                gioiTinh: this.props.nvgioitinh,
+                hinhAnh: this.props.nvpic,
+                diaChiThuongTru: this.props.nvdcthuongtru,
+                choOhienTai: this.props.nvchohientai,
+                soCmnn: this.props.nvsocmnd,
+                ngayCap: this.props.nvngaycap,
+                tonGiao: this.props.nvtongiao,
+                noiCap: this.props.nvnoicap,
+                quocTich: this.props.nvquoctich,
+                email: this.props.nvmail,
+                soDienThoai: this.props.nvsdt,
+                //nganhHoc: this.props.nvnganhhoc,
+                noiDaoTao: this.props.nvnoidaotao,  ////////
+                //xepLoai: this.props.nvxeploai,
+                //username
+                idphongBan: this.props.nvpb,
+                idchucVu: this.props.nvcv,
+                //idquanHeGd
+                trangthaiHdthuViec: "Đã ký",
+                iddanToc: this.props.nvdantoc,
+                idtrinhDo: this.props.nvdaotao,
+                idquyetDinhBn: this.props.nvqdbn
+            })
+            alert("Thành công")
         }
+    }
 
+    handleChange = (event) => {
+        const name = event.target.name;
+        const values = event.target.value;
+        //console.log("ban dau: " + name)
+        //console.log("value bd: " + values)
+
+        var tang2thang = addMonths(new Date(values), 2)
+        //console.log("tang 2 thang: " + tang2thang)
+
+        var result = format(new Date(tang2thang), 'yyyy-MM-dd')
+        //console.log("format lai: " + result)
+        this.setState({
+            HopdongBD: result
+        })
+    }
+
+    showModalBody() {
+        return (
+            <Form onSubmit={this.handleSubmit}>
+                <Row>
+                    <Col sm={12}>
+                        <Row className="mt-1">
+                            <Col sm={3}>
+                                <img
+                                    src={this.props.nvpic}
+                                    //srcSet={this.state.url}
+                                    className="ml-5"
+                                    height="100px"
+                                    width="100px"
+                                />
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    name="NhanvienID"
+                                    size="small"
+                                    variant="outlined"
+                                    label="ID nhân viên"
+                                    defaultValue={this.props.nvid}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={3} className="mt-3">
+                                <StyledKeID
+                                    name="NhanvienHO"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Họ đệm"
+                                    defaultValue={this.props.nvho}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    name="NhanvienTEN"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tên"
+                                    defaultValue={this.props.nvten}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></TextField>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <StyledGioiTinh
+                                    name="NhanvienGIOITINH"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Giới tính"
+                                    defaultValue={this.props.nvgioitinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledGioiTinh>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={3}></Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    name="HopdongKY"
+                                    //size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Ngày lập hợp đồng"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    name="HopdongBD"
+                                    //size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Thử việc từ ngày"
+                                    onChange={(event) => this.handleChange(event)}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    name="HopdongKT"
+                                    //size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Kết thúc ngày"
+                                    value={this.state.HopdongBD}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <hr />
+                <Row>
+                    <Col sm={2}>
+                        <Button
+                            className="ml-2"
+                            variant="contained"
+                            color="primary"
+                            type="submit"
+                            startIcon={<DoneAllIcon />}
+                            onClick={this.props.onHide}
+                        >XÁC NHẬN</Button>
+                    </Col>
+                </Row>
+            </Form>
+        )
     }
 
     render() {
@@ -164,7 +285,7 @@ export class AddHDThuViecModal extends Component {
 
                 <Modal
                     {...this.props}
-                    size="lg"
+                    size="xl"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
                 >
@@ -174,86 +295,19 @@ export class AddHDThuViecModal extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Row>
-                            <Col sm={12} >
-                                <Form onSubmit={this.handleSubmit}>
-                                    <Row>
-                                        <Col sm={6}>
-
-                                            <Form.Group controlId="NhanvienID">
-                                                <Form.Label>ID nhân viên</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienID"
-                                                    required
-                                                    disabled
-                                                    defaultValue={this.props.nvid}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="HopdongBD">
-                                                <Form.Label>Thử việc từ ngày</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    name="HopdongBD"
-                                                    required
-                                                    onChange={(event) => this.handleChange(event)}
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-                                        <Col sm={6}>
-
-                                            <Form.Group controlId="NhanvHopdongKY">
-                                                <Form.Label>Ngày lập hợp đồng</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    name="HopdongKY"
-                                                    required
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="HopdongKT">
-                                                <Form.Label>Kết thúc ngày</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    name="HopdongKT"
-                                                    disabled
-                                                    // value={format(new Date (this.state.HopdongBD), 'dd/MM/yyyy')}
-                                                    value={this.state.HopdongBD}
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col sm={12}>
-
-                                            <Form.Group controlId="HopdongGHICHU">
-                                                <Form.Label>Ghi chú</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="HopdongGHICHU"
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-                                    </Row>
-                                    <Form.Group>
-                                        <Button variant="primary" type="submit" onClick={this.props.onHide}>
-                                            Xác nhận
-                                        </Button>
-                                    </Form.Group>
-                                </Form>
-                            </Col>
-                        </Row>
+                        {this.showModalBody()}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button className="btn btn-block btn-secondary" onClick={this.props.onHide}>Đóng</Button>
+                        <Button
+                            className="mr-3"
+                            variant="contained"
+                            color="inherit"
+                            startIcon={<CancelIcon />}
+                            onClick={this.props.onHide}
+                        >Đóng</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
-
         );
 
     }

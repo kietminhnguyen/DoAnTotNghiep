@@ -2,15 +2,15 @@ import React, { Component } from 'react'
 import { Form, Row, Col } from 'react-bootstrap';
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Select, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles';
-import ExposureIcon from '@material-ui/icons/Exposure';
-import LockIcon from '@material-ui/icons/Lock';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
+//import ExposureIcon from '@material-ui/icons/Exposure';
+//import LockIcon from '@material-ui/icons/Lock';
+//import LockOpenIcon from '@material-ui/icons/LockOpen';
 
-import { format, differenceInDays, getMonth, getYear } from 'date-fns'
+import { format, getMonth, getYear } from 'date-fns'
 import axios from 'axios';
 
-import { EditLuongThangModal } from './EditLuongThangModal'
-import { ShowLuongThangModal } from './ShowLuongThangModal'
+//import { EditLuongThangModal } from './EditLuongThangModal'
+//import { ShowLuongThangModal } from './ShowLuongThangModal'
 
 
 const StyledTableCell = withStyles((theme) => ({
@@ -33,7 +33,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 const StyledTable = withStyles((theme) => ({
     root: {
-        minWidth: 2000,
+        minWidth: 3000,
         border: 1
     },
 }))(Table);
@@ -44,14 +44,14 @@ export class AppTraCuuLuong extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pbs:[],
+            pbs: [],
             nhanviens: [],
             bangluongs: [],
             cctonghops: [],
             //chonLoaiHD: -1,
             arrayBL: [],
             ThangNamChamCong: 'dd-MM-yyyy',
-            chonPB:'',
+            chonPB: '',
             addModalShow: false,
             editModalShow: false,
             showModalShow: false
@@ -113,7 +113,7 @@ export class AppTraCuuLuong extends Component {
         })
     }
 
-    selectPB(){
+    selectPB() {
         return <Select className="ml-3"
             name="chonPB"
             value={this.state.chonPB}
@@ -140,15 +140,15 @@ export class AppTraCuuLuong extends Component {
         })
 
         var flag = false
-        for(let i=0; i<bangluongs.length; i++){
-            if(bangluongs[i].trangThai == 1
+        for (let i = 0; i < bangluongs.length; i++) {
+            if (bangluongs[i].trangThai == 1
                 && (layThangDaChon == bangluongs[i].thang
-                && layNamDaChon == bangluongs[i].nam )){
-                    flag = true
-                }
+                    && layNamDaChon == bangluongs[i].nam)) {
+                flag = true
+            }
         }
-        if(flag){
-            return bangluongs.map((bl, key) => {
+        if (flag) {
+            return bangluongs.map(bl => {
                 return nhanviens.map(nv => {
                     if (bl.idnhanVien == nv.idnhanVien
                         //&& ( parseInt(this.state.ThangNamChamCong.substring(6,7)) == bl.thang )
@@ -156,32 +156,37 @@ export class AppTraCuuLuong extends Component {
                         && (layThangDaChon == bl.thang)
                         && (layNamDaChon == bl.nam)
                     ) {
-    
-                        return (<StyledTableRow key={bl.thang}>
+
+                        return (<StyledTableRow>
                             <StyledTableCell align="left">{this.layTenNV(bl.idnhanVien)}</StyledTableCell>
                             <StyledTableCell align="center">{bl.idnhanVien}</StyledTableCell>
                             <StyledTableCell align="center">{bl.heSoChucVu}</StyledTableCell>
                             <StyledTableCell align="center">{bl.heSoChuyenMon}</StyledTableCell>
-                            <StyledTableCell align="center">{bl.mucLuong}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.mucLuong)}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.soNgayDiTre}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.soNgayDiTreKhongTinhLuong}</StyledTableCell>
                             <StyledTableCell align="center">{bl.soNgayNghi}</StyledTableCell>
                             <StyledTableCell align="center">{bl.soNgayCong}</StyledTableCell>
-                            {/* <StyledTableCell align="center">{formatter.format(bl.tienNgayNghi)}</StyledTableCell> */}
+                            <StyledTableCell align="center">{bl.tongGioTangCa}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienTangCa)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienPhatDiTre)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.tienPhat)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.tienTamUng)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.thueTncn)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.truBh)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.tienThuong)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(730000)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.phuCapKhac)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.tienThucLinh)}</StyledTableCell>
-                            
+                            <StyledTableCell align="center">IN</StyledTableCell>    
                         </StyledTableRow>)
                     }
                 })
             })
         }
-        else{
+        else {
             return (
-            <h2 className="display-7">Không có dữ liệu</h2>)
+                <h2 className="display-7">Không có dữ liệu</h2>)
         }
     }
 
@@ -214,7 +219,7 @@ export class AppTraCuuLuong extends Component {
                         </Col> */}
                         <Form.Label className="mt-2 ml-4">Chọn tháng năm:</Form.Label>
                         <Col sm={3}>
-                        <Form.Group controlId="ThangNamChamCong">
+                            <Form.Group controlId="ThangNamChamCong">
                                 <Form.Control
                                     type="month"
                                     name="ThangNamChamCong"
@@ -236,16 +241,22 @@ export class AppTraCuuLuong extends Component {
                                 <StyledTableCell align="center">Hệ số chức vụ</StyledTableCell>
                                 <StyledTableCell align="center">Hệ số chuyên môn</StyledTableCell>
                                 <StyledTableCell align="center">Mức lương</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày đi trễ ˂ 60 phút</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày đi trễ ≥ 60 phút</StyledTableCell>
                                 <StyledTableCell align="center">Số ngày nghỉ</StyledTableCell>
                                 <StyledTableCell align="center">Số ngày công</StyledTableCell>
-                                {/* <StyledTableCell align="center">Tiền ngày nghĩ</StyledTableCell> */}
-                                <StyledTableCell align="center">Tiền kỉ luật</StyledTableCell>
+                                <StyledTableCell align="center">Số giờ tăng ca</StyledTableCell>
+                                <StyledTableCell align="center">Tiền tăng ca</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phạt đi trễ</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phạt kỉ luật</StyledTableCell>
                                 <StyledTableCell align="center">Tiền ứng</StyledTableCell>
                                 <StyledTableCell align="center">Tiền thuế TNCN</StyledTableCell>
                                 <StyledTableCell align="center">Tiền bảo hiểm</StyledTableCell>
                                 <StyledTableCell align="center">Tiền khen thưởng</StyledTableCell>
                                 <StyledTableCell align="center">Tiền phụ cấp</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phụ cấp khác</StyledTableCell>
                                 <StyledTableCell align="center">Thực lĩnh</StyledTableCell>
+                                <StyledTableCell align="right">Chức năng</StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>

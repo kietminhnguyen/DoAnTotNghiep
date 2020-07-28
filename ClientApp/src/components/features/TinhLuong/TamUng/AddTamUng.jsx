@@ -1,10 +1,42 @@
 import React, { Component } from 'react';
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
-import { format, getMonth, getYear } from 'date-fns';
+
+import { Modal, Row, Col, Form } from 'react-bootstrap';
+import { TextField, Button } from "@material-ui/core";
+import InputAdornment from '@material-ui/core/InputAdornment';
+import { withStyles } from '@material-ui/core/styles';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AppCSS from '../../../../AppCSS.css'
+import { format } from 'date-fns';
 
 import axios from 'axios';
+
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
+
+const StyledGioiTinh = withStyles((theme) => ({
+    root: {
+        minWidth: 120
+    },
+}))(TextField);
+
+const StyledNgay = withStyles((theme) => ({
+    root: {
+        width: 250
+    },
+}))(TextField);
+
+const StyledKeID = withStyles((theme) => ({
+    root: {
+        width: 255
+    },
+}))(TextField);
+
+const StyledNoiDung = withStyles((theme) => ({
+    root: {
+        width: 535
+    },
+}))(TextField);
 
 export class AddTamUng extends Component {
     //static displayName = AddChamCongThuCong.name;
@@ -69,10 +101,10 @@ export class AddTamUng extends Component {
             if ((this.state.tamungluongs[i].ngayTamUng.substring(0, 7) == this.state.TamUngNgay.substring(0, 7))
                 && parseInt(this.props.idnv) == parseInt(this.state.tamungluongs[i].idnhanVien)
             ) {
-                tongTien= tongTien + parseInt(this.state.tamungluongs[i].soTienTamUng)
+                tongTien = tongTien + parseInt(this.state.tamungluongs[i].soTienTamUng)
             }
         }
-        console.log("đã ứng: "+tongTien)
+        console.log("đã ứng: " + tongTien)
         if (tongTien >= 3000000) { // kt tổng tiền ứng có lớn hơn luongCB/2
             alert("Tháng này đã tạm ứng vượt 50% lương cơ bản")
         }
@@ -85,10 +117,10 @@ export class AddTamUng extends Component {
                 //console.log("sum= "+tongTien)
                 axios.post('https://localhost:44390/api/tamungluongs', {
                     ngayTamUng: event.target.TamUngNgay.value,
-                    idnhanVien: parseInt(this.props.idnv),
                     soTienTamUng: event.target.TamUngSOTIEN.value,
                     lyDoTamUng: event.target.TamUngLYDO.value,
-                    ghiChu: event.target.ChamCongGhiChu.value,
+                    ghiChu: event.target.TamUngGHICHU.value,
+                    idnhanVien: parseInt(this.props.idnv),
                 })
                     .then(response => {
                         //console.log(response)
@@ -98,6 +130,141 @@ export class AddTamUng extends Component {
                 ///////////////////////
             }
         }
+    }
+
+    showModalBody() {
+        return (
+            <Form onSubmit={this.handleSubmit}>
+                <Row>
+                    <Col sm={12}>
+                        <Row className="mt-1">
+                            <Col sm={3}>
+                                <img
+                                    src={this.props.nvpic}
+                                    //srcSet={this.state.url}
+                                    className="ml-5"
+                                    height="100px"
+                                    width="100px"
+                                />
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    //name="QUYETDINHidnhanvien"
+                                    size="small"
+                                    variant="outlined"
+                                    label="ID nhân viên"
+                                    defaultValue={this.props.idnv}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={3} className="mt-3">
+                                <StyledKeID
+                                    //name="QUYETDINHhodem"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Họ đệm"
+                                    defaultValue={this.props.cchodem}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    //name="QUYETDINHtennv"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tên"
+                                    defaultValue={this.props.ccten}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></TextField>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <StyledGioiTinh
+                                    //name="NhanvienGIOITINH"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Giới tính"
+                                    defaultValue={this.props.nvgioitinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledGioiTinh>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3">
+                            <Col sm={3}></Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    name="TamUngNgay"
+                                    //size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Ngày tạm ứng"
+                                    defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    name="TamUngSOTIEN"
+                                    //size="small"
+                                    //type="date"
+                                    variant="outlined"
+                                    label="Số tiền tạm ứng"
+                                    //onChange={(event) => this.handleChange(event)}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">VND</InputAdornment>,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}></Col>
+                        </Row>
+                        <Row >
+                            <Col sm={6} className="mt-4">
+                                <StyledNoiDung
+                                    name="TamUngLYDO"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Lý do tạm ứng"
+                                    multiline rows={3}
+                                ></StyledNoiDung>
+                            </Col>
+                            <Col sm={6} className="mt-4">
+                                <StyledNoiDung
+                                    name="TamUngGHICHU"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Ghi chú"
+                                    multiline rows={3}
+                                ></StyledNoiDung>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <Row className="mt-4"></Row>
+                <hr />
+                <Row>
+                    <Col sm={2}>
+                        <Button
+                            className="ml-2"
+                            variant="contained"
+                            color="primary"
+                            type="submit"
+                            startIcon={<DoneAllIcon />}
+                            onClick={this.props.onHide}
+                        >XÁC NHẬN</Button>
+                    </Col>
+                </Row>
+            </Form>
+        )
     }
 
     render() {
@@ -119,110 +286,26 @@ export class AddTamUng extends Component {
 
                 <Modal
                     {...this.props}
-                    size="lg"
+                    size="xl"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="contained-modal-title-vcenter">
-                            Tạm ứng lương
+                            TẠM ỨNG LƯƠNG
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Row >
-                            <Col sm={12} >
-                                <Form onSubmit={this.handleSubmit}>
-                                    <Row >
-                                        <Col>
-                                            <Row>
-                                                <Col sm={4}>
-                                                    <Form.Group controlId="TamUngNgay">
-                                                        <Form.Label>Ngày Tạm Ứng</Form.Label>
-                                                        <Form.Control
-                                                            type="date"
-                                                            name="TamUngNgay"
-                                                            required
-                                                            disabled
-                                                            defaultValue={format(new Date(), 'yyyy-MM-dd')}
-                                                            //onChange={(event) => this.handleChange(event)}
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={4}>
-                                                    <Form.Group controlId="ChamCongHoDem">
-                                                        <Form.Label>Họ đệm</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongHoDem"
-                                                            required
-                                                            disabled
-                                                            defaultValue={this.props.cchodem}
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={4}>
-                                                    <Form.Group controlId="ChamCongTen">
-                                                        <Form.Label>Tên</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongTen"
-                                                            required
-                                                            disabled
-                                                            defaultValue={this.props.ccten}
-
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <Col sm={6}>
-                                                    <Form.Group controlId="TamUngSOTIEN">
-                                                        <Form.Label>Số tiền</Form.Label>
-                                                        <Form.Control
-                                                            type='text'
-                                                            name="TamUngSOTIEN"
-                                                            required
-
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={6}>
-                                                    <Form.Group controlId="TamUngLYDO">
-                                                        <Form.Label>Lý do</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="TamUngLYDO"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <Col sm={12}>
-                                                    <Form.Group controlId="ChamCongGhiChu">
-                                                        <Form.Label>Ghi Chú</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongGhiChu"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-                                    </Row>
-                                    <Form.Group>
-                                        <Button variant="info" type="submit" onClick={this.props.onHide}>
-                                            Xác nhận
-                                        </Button>
-                                    </Form.Group>
-                                </Form>
-                            </Col>
-                        </Row>
+                        {this.showModalBody()}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button className="btn btn-block btn-secondary" onClick={this.props.onHide}>Đóng</Button>
+                        <Button
+                            className="mr-3"
+                            variant="contained"
+                            color="inherit"
+                            startIcon={<CancelIcon />}
+                            onClick={this.props.onHide}
+                        >Đóng</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

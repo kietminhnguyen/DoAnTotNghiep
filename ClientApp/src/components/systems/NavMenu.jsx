@@ -108,11 +108,11 @@ class NavMenu extends Component {
                   <div className="nav-item">
                     <Link to="/home" className="menu-item">Trang chủ</Link>
                   </div>
-{/*=============================================================================================================== */}
+                  {/*=============================================================================================================== */}
                   <div className="nav-item has-sub">
                     <a><i className="ik ik-list" /><span>Danh mục</span></a>
                     <div className="submenu-content">
-                      <Link to="/user" className="menu-item">Người dùng</Link>
+                      <Link to="/nguoidung" className="menu-item">Người dùng</Link>
                       <Link to="/phongban" className="menu-item">Phòng ban</Link>
                       <Link to="/chucvu" className="menu-item">Chức vụ</Link>
                     </div>
@@ -142,32 +142,35 @@ class NavMenu extends Component {
                   <div className="nav-item has-sub">
                     <a><i className="ik ik-award" /><span>Quyết định</span></a>
                     <div className="submenu-content">
-                    <Link to="/lapquyetdinh" className="menu-item">Lập Quyết Định</Link>
-                      <Link to="/quyetdinhkhenthuong" className="menu-item">Khen thưởng</Link>
-                      <Link to="/quyetdinhkiluat" className="menu-item">Kỹ luật</Link>
                       <Link to="/thoiviec" className="menu-item">Thôi việc</Link>
+                      <Link to="/lapquyetdinh" className="menu-item">Lập quyết định</Link>
+                      <Link to="/quyetdinhkhenthuong" className="menu-item">Xem QD khen thưởng</Link>
+                      <Link to="/quyetdinhkiluat" className="menu-item">Xem QD kỷ luật</Link>
+                      <Link to="/xemqdbn" className="menu-item">Xem QD bổ nhiệm</Link>
+
                     </div>
                   </div>
 
                   <div className="nav-item has-sub">
                     <a><i className="ik ik-list" /><span>Chấm công</span></a>
                     <div className="submenu-content">
-                    <Link to="/bangchamcong" className="menu-item">Tra cứu ngày công</Link>
+                      <Link to="/bangchamcong" className="menu-item">Tra cứu ngày công</Link>
                       <Link to="/chamcongmavach" className="menu-item">Chấm công mã vạch</Link>
                       <Link to="/chamcongbosung" className="menu-item">Chấm công bổ sung</Link>
                       <Link to="/dodulieu" className="menu-item">Đỗ dữ liệu chấm công</Link>
                     </div>
                   </div>
-                    
+
                   <div className="nav-item has-sub">
                     <a><i className="ik ik-list" /><span>Tính lương</span></a>
                     <div className="submenu-content">
                       <Link to="/tamungluong" className="menu-item">Tạm ứng lương</Link>
                       <Link to="/luongthang" className="menu-item">Tính lương tháng</Link>
                       <Link to="/tracuuluong" className="menu-item">Tra cứu lương</Link>
+                      <Link to="/tracuutamung" className="menu-item">Tra cứu tạm ứng</Link>
                     </div>
-                  </div>  
-                
+                  </div>
+
                 </nav>
               </div>
             </div>

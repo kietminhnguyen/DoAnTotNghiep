@@ -169,23 +169,23 @@ export class AppBangChamCong extends Component {
         const { nhanviens, chamcongs, idchamcong, ccghichu, ccngay, ccgiovao, ccgiora, ccidnv } = this.state;
         let editModalClose = () => this.setState({ editModalShow: false })
 
-        return chamcongs.map((cc, key) => {
+        return chamcongs.map(cc => {
             return nhanviens.map(nv => {
                 if (cc.idnhanVien == nv.idnhanVien
                     && ((cc.ngayChamCong.substring(0, 10) == this.state.ngayChamCong )
                         && (nv.idphongBan == this.state.idphongBan || this.state.idphongBan == ''))
                 ) {
                     return (
-                        <StyledTableRow key={cc.idchamCong}>
-                            <StyledTableCell>{key + 1}</StyledTableCell>
-                            <StyledTableCell>{this.layTenNV(cc.idnhanVien)}</StyledTableCell>
+                        <StyledTableRow>
+                            {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
+                            <StyledTableCell align="center">{this.layTenNV(cc.idnhanVien)}</StyledTableCell>
                             {/* <StyledTableCell>{cc.idnhanVien}</StyledTableCell> */}
-                            <StyledTableCell>{this.layTenPB(nv.idphongBan)}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(cc.ngayChamCong), 'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>{cc.gioVao.substring(0, 5)}</StyledTableCell>
-                            <StyledTableCell>{cc.gioRa.substring(0, 5)}</StyledTableCell>
-                            <StyledTableCell>{cc.soGioLam}</StyledTableCell>
-                            <StyledTableCell>
+                            <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
+                            <StyledTableCell align="center">{format(new Date(cc.ngayChamCong), 'dd-MM-yyyy')}</StyledTableCell>
+                            <StyledTableCell align="center">{cc.gioVao.substring(0, 5)}</StyledTableCell>
+                            <StyledTableCell align="center">{cc.gioRa.substring(0, 5)}</StyledTableCell>
+                            <StyledTableCell align="center">{cc.soGioLam}</StyledTableCell>
+                            <StyledTableCell align="right">
                                 <ButtonGroup variant="text">
 
                                     <Button>
@@ -235,10 +235,10 @@ export class AppBangChamCong extends Component {
                     <h1 className="display-7">TRA CỨU NGÀY CÔNG</h1><hr />
                 </div>
                 <Form>
-                    <Row>
-                        <Form.Label className="mt-2">Chọn phòng ban:</Form.Label>
-                        <Col sm={3} >
-                            <Form.Group controlId="idphongBan" className="ml-2">
+                    <Row >
+                        <Form.Label className="mt-2 ml-4">Chọn phòng ban:</Form.Label>
+                        <Col sm={3} className="ml-2">
+                            <Form.Group controlId="idphongBan" >
                                 {this.getNVtoPB()}
                             </Form.Group>
                         </Col>
@@ -261,15 +261,15 @@ export class AppBangChamCong extends Component {
                     <StyledTable className="mt-3">
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell>#</StyledTableCell>
-                                <StyledTableCell>Tên Nhân Viên</StyledTableCell>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
+                                <StyledTableCell align="center">Tên nhân viên</StyledTableCell>
                                 {/* <StyledTableCell>ID Nhân Viên</StyledTableCell> */}
-                                <StyledTableCell>Thuộc phòng ban</StyledTableCell>
-                                <StyledTableCell>Ngày Chấm Công</StyledTableCell>
-                                <StyledTableCell>Giờ Vào</StyledTableCell>
-                                <StyledTableCell>Giờ Ra</StyledTableCell>
-                                <StyledTableCell>Số Giờ Làm</StyledTableCell>
-                                <StyledTableCell>Chức Năng</StyledTableCell>
+                                <StyledTableCell align="center">Thuộc phòng ban</StyledTableCell>
+                                <StyledTableCell align="center">Ngày chấm công</StyledTableCell>
+                                <StyledTableCell align="center">Giờ vào</StyledTableCell>
+                                <StyledTableCell align="center">Giờ ra</StyledTableCell>
+                                <StyledTableCell align="center">Số giờ làm</StyledTableCell>
+                                <StyledTableCell align="center">Chức năng</StyledTableCell>
 
                             </StyledTableRow>
                         </TableHead>

@@ -4,6 +4,7 @@ import { Form } from 'react-bootstrap'
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, ButtonGroup, Button, Select, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
 
 import { AddHDChinhThucModal } from './AddHDChinhThucModal'
 import { ShowHDChinhThucModal } from './ShowHDChinhThucModal'
@@ -41,7 +42,6 @@ export class AppHDChinhThuc extends Component {
         super(props);
         this.state = {
             pbs: [],
-            hds: [],
             nhanviens: [],
             chonPB: '',
             addModalShow: false,
@@ -54,13 +54,11 @@ export class AppHDChinhThuc extends Component {
     componentDidMount() {
         this.loadNV()
         this.loadPB()
-        //this.loadHD()
     }
 
-    // componentDidUpdate() {
-    //     this.loadNV()
-    //     //this.loadHD()
-    // }
+    componentDidUpdate() {
+        this.loadNV()
+    }
 
     loadNV() {
         fetch('https://localhost:44390/api/nhanviens')
@@ -78,37 +76,14 @@ export class AppHDChinhThuc extends Component {
             })
     }
 
-    loadHD() {
-        fetch('https://localhost:44390/api/hopdongs')
-            .then(respone => respone.json())
-            .then(data => {
-                this.setState({ hds: data })
-            })
-    }
-
     handleChange(event) {
         this.setState({
             chonPB: event.target.value
         })
     }
 
-    handleCloseSelect = () => {
-        this.setState({
-            setOpen: false
-        })
-    };
-
-    handleOpenSelect = () => {
-        this.setState({
-            setOpen: true
-        })
-    };
-
     selectPB = () => {
         return <Select className="ml-3"
-            //open={open}
-            onClose={this.handleCloseSelect}
-            onOpen={this.handleOpenSelect}
             value={this.state.chonPB}
             onChange={this.handleChange}>
             {
@@ -125,14 +100,14 @@ export class AppHDChinhThuc extends Component {
     showButtonKy(idnv) {
         return this.state.nhanviens.map(nv => {
             if (nv.trangthaiHdchinhThuc == null
-                && nv.noiDaoTao == null
+                && nv.noiDaoTao != "Bổ nhiệm"
                 && idnv == nv.idnhanVien
             ) {
                 return (
                     <Button
                         variant="contained"
-                        color="secondary"
-                        //startIcon={<NoEncryptionIcon />}
+                        color="primary"
+                        startIcon={<MenuBookIcon />}
                         onClick={() => this.setState({
                             addModalShow: true,
                             nvid: nv.idnhanVien,
@@ -152,14 +127,15 @@ export class AppHDChinhThuc extends Component {
                             nvngaycap: nv.ngayCap,
                             nvnoicap: nv.noiCap,
                             nvmail: nv.email,
-                            nvnganhhoc: nv.nganhHoc,
+                            //nvnganhhoc: nv.nganhHoc,
                             nvnoidaotao: nv.noiDaoTao,
-                            nvxeploai: nv.xepLoai,
+                            //nvxeploai: nv.xepLoai,
                             nvdantoc: nv.iddanToc,
                             nvdaotao: nv.idtrinhDo,
                             nvquoctich: nv.quocTich,
                             nvcv: nv.idchucVu,
-                            nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc
+                            nvchinhthuc: nv.trangthaiHdchinhThuc,
+                            nvhinh: nv.hinhAnh
                         })}
                     >Ký hợp đồng
                     </Button>)
@@ -170,21 +146,22 @@ export class AppHDChinhThuc extends Component {
     getData = () => {
         let addModalClose = () => this.setState({ addModalShow: false })
         let showModalClose = () => this.setState({ showModalShow: false })
-        const { nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail,
-            nvtrangthaiHdChinhThuc, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
-            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvnganhhoc,
-            nvnoidaotao, nvxeploai, nvdantoc, nvdaotao } = this.state
-        return nhanviens.map((nv, key) => {
-            if (nv.noiDaoTao == null
-                && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
-                ) {
+        const { nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail, nvhinh,
+            nvchinhthuc, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
+            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich,
+            nvnoidaotao, nvdantoc, nvdaotao } = this.state
+        return nhanviens.map(nv => {
+            if (nv.noiDaoTao != "Bổ nhiệm"
+                && nv.idphongBan == this.state.chonPB
+                //|| this.state.chonPB == '')
+            ) {
                 return (
-                    <StyledTableRow key={nv.idnhanVien}>
-                        <StyledTableCell>{key + 1}</StyledTableCell>
+                    <StyledTableRow>
+                        {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
                         <StyledTableCell>{nv.hoDem}</StyledTableCell>
                         <StyledTableCell>{nv.ten}</StyledTableCell>
                         <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
-                        <StyledTableCell align="right">{nv.soDienThoai}</StyledTableCell>
+                        <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
                         <StyledTableCell align="center">{nv.trangthaiHdchinhThuc}</StyledTableCell>
                         <StyledTableCell align="right">
 
@@ -211,18 +188,18 @@ export class AppHDChinhThuc extends Component {
                                         nvngaycap: nv.ngayCap.substring(0, 10),
                                         nvnoicap: nv.noiCap,
                                         nvmail: nv.email,
-                                        nvnganhhoc: nv.nganhHoc,
+                                        //nvnganhhoc: nv.nganhHoc,
                                         nvnoidaotao: nv.noiDaoTao,
-                                        nvxeploai: nv.xepLoai,
+                                        //nvxeploai: nv.xepLoai,
                                         nvdantoc: nv.iddanToc,
                                         nvdaotao: nv.idtrinhDo,
                                         nvquoctich: nv.quocTich,
                                         nvcv: nv.idchucVu,
-                                        nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc
+                                        nvchinhthuc: nv.trangthaiHdchinhThuc,
+                                        nvhinh: nv.hinhAnh
                                     })}>
                                 </VisibilityIcon>
                             </Button>
-
 
                             <AddHDChinhThucModal
                                 show={this.state.addModalShow}
@@ -243,15 +220,16 @@ export class AppHDChinhThuc extends Component {
                                 nvngaycap={nvngaycap}
                                 nvnoicap={nvnoicap}
                                 nvmail={nvmail}
-                                nvnganhhoc={nvnganhhoc}
+                                //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
-                                nvxeploai={nvxeploai}
+                                //nvxeploai={nvxeploai}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
                                 nvquoctich={nvquoctich}
                                 nvcv={nvcv}
-                                nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
+                                nvchinhthuc={nvchinhthuc}
+                                nvpic={nvhinh}
                             />
 
                             <ShowHDChinhThucModal
@@ -273,15 +251,16 @@ export class AppHDChinhThuc extends Component {
                                 nvngaycap={nvngaycap}
                                 nvnoicap={nvnoicap}
                                 nvmail={nvmail}
-                                nvnganhhoc={nvnganhhoc}
+                                //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
-                                nvxeploai={nvxeploai}
+                                //nvxeploai={nvxeploai}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
                                 nvquoctich={nvquoctich}
                                 nvcv={nvcv}
-                                nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
+                                nvchinhthuc={nvchinhthuc}
+                                nvpic={nvhinh}
                             />
                         </StyledTableCell>
                     </StyledTableRow>)
@@ -301,22 +280,22 @@ export class AppHDChinhThuc extends Component {
                 {this.selectPB()}
 
                 <TableContainer>
-                <StyledTable className="mt-3">
-                    <TableHead>
-                        <StyledTableRow>
-                            <StyledTableCell>#</StyledTableCell>
-                            <StyledTableCell>Họ đệm</StyledTableCell>
-                            <StyledTableCell>Tên</StyledTableCell>
-                            <StyledTableCell>Giới tính</StyledTableCell>
-                            <StyledTableCell>Số điện thoại</StyledTableCell>
-                            <StyledTableCell>Trạng thái</StyledTableCell>
-                            <StyledTableCell>Chức năng</StyledTableCell>
-                        </StyledTableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.getData()}
-                    </TableBody>
-                </StyledTable>
+                    <StyledTable className="mt-3">
+                        <TableHead>
+                            <StyledTableRow>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
+                                <StyledTableCell>Họ đệm</StyledTableCell>
+                                <StyledTableCell>Tên</StyledTableCell>
+                                <StyledTableCell align="center">Giới tính</StyledTableCell>
+                                <StyledTableCell align="center">Số điện thoại</StyledTableCell>
+                                <StyledTableCell align="center">Trạng thái</StyledTableCell>
+                                <StyledTableCell align="right">Chức năng</StyledTableCell>
+                            </StyledTableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.getData()}
+                        </TableBody>
+                    </StyledTable>
                 </TableContainer>
             </div>
         )

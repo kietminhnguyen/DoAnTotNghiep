@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
-import { Form } from 'react-bootstrap'
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, ButtonGroup, Button, Select, MenuItem } from '@material-ui/core'
+import axios from 'axios';
+import { Form, Col, Row } from 'react-bootstrap'
+import {
+    TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
+    Button, Select, MenuItem, FormControlLabel, RadioGroup, Radio
+} from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import EditIcon from "@material-ui/icons/Edit"
 import DeleteIcon from "@material-ui/icons/Delete"
@@ -45,16 +49,22 @@ export class AppXemHDThuViec extends Component {
             nvs: [],
             pbs: [],
             chonPB: '',
+            chonRadio: "Chưa hủy",
             // addModalShow: false,
             // editModalShow: false,
             // showModalShow: false
         }
         this.handleChange = this.handleChange.bind(this)
+        this.handleChangeCheck = this.handleChangeCheck.bind(this)
     }
 
     componentDidMount() {
         this.loadNV()
         this.loadPB()
+        this.loadHD()
+    }
+
+    componentDidUpdate(){
         this.loadHD()
     }
 
@@ -88,23 +98,14 @@ export class AppXemHDThuViec extends Component {
         })
     }
 
-    handleCloseSelect = () => {
+    handleChangeCheck(event) {
         this.setState({
-            setOpen: false
+            chonRadio: event.target.value
         })
-    };
-
-    handleOpenSelect = () => {
-        this.setState({
-            setOpen: true
-        })
-    };
+    }
 
     selectPB = () => {
         return <Select className="ml-3"
-            //open={open}
-            onClose={this.handleCloseSelect}
-            onOpen={this.handleOpenSelect}
             value={this.state.chonPB}
             onChange={this.handleChange}>
             {
@@ -127,11 +128,73 @@ export class AppXemHDThuViec extends Component {
         return idNVofHD
     }
 
+    xoaHD(idhd, idnv) {
+        if (window.confirm('Bạn có chắc muốn xóa hợp đồng của nhân viên này?')) {
+            axios.delete('https://localhost:44390/api/hopdongs/' + idhd)
+
+            var arrayNV = []
+            for (let i = 0; i < this.state.nvs.length; i++) {
+                if (this.state.nvs[i].idnhanVien == idnv) {
+                    arrayNV.push({
+                        idnhanVien: idnv,
+                        hoDem: this.state.nvs[i].hoDem,
+                        ten: this.state.nvs[i].ten,
+                        tinhTrangHonNhan: this.state.nvs[i].tinhTrangHonNhan,
+                        ngaySinh: this.state.nvs[i].ngaySinh,
+                        noiSinh: this.state.nvs[i].noiSinh,
+                        gioiTinh: this.state.nvs[i].gioiTinh,
+                        hinhAnh: this.state.nvs[i].hinhAnh,
+                        diaChiThuongTru: this.state.nvs[i].diaChiThuongTru,
+                        choOhienTai: this.state.nvs[i].choOhienTai,
+                        soCmnn: this.state.nvs[i].soCmnn,
+                        ngayCap: this.state.nvs[i].ngayCap,
+                        tonGiao: this.state.nvs[i].tonGiao,
+                        noiCap: this.state.nvs[i].noiCap,
+                        quocTich: this.state.nvs[i].quocTich,
+                        email: this.state.nvs[i].email,
+                        soDienThoai: this.state.nvs[i].soDienThoai,
+                        //nganhHoc: event.target.NhanvienNganhHoc.value,
+                        noiDaoTao: this.state.nvs[i].noiDaoTao,
+                        //xepLoai: this.props.,
+                        //username
+                        idphongBan: this.state.nvs[i].idphongBan,
+                        idchucVu: this.state.nvs[i].idchucVu,
+                        //idquanHeGd
+                        ////trangThaiHoSo=> 
+                        trangthaiHDThuViec: "Đã xóa hđ",
+                        trangthaiHDChinhThuc: "Đã xóa hđ",
+                        iddanToc: this.state.nvs[i].iddanToc,
+                        idtrinhDo: this.state.nvs[i].idtrinhDo,
+                        idquyetDinhBn: this.state.nvs[i].idquyetDinhBn,
+                    })
+                }
+            }
+            axios.put('https://localhost:44390/api/nhanviens/mangput', arrayNV)
+            alert("Xóa thành công")
+        }
+    }
+
+    checkBtnXoaHD(idnv) {
+        return this.state.nvs.map(nv => {
+            return this.state.hds.map(hd => {
+                if (idnv == nv.idnhanVien  /// hợp đồng CHÍNH THỨC
+                    && (nv.trangthaiHdthuViec == "Đã thôi việc" && nv.trangthaiHdchinhThuc == "Đã thôi việc")
+                    && nv.noiDaoTao == "Bổ nhiệm"
+                    && idnv == hd.idnhanVien
+                    && hd.idloaiHd == 10
+                    && hd.ghiChu == "Hủy"
+                ) {
+                    return (
+                        <Button><DeleteIcon color="secondary"
+                            onClick={() => this.xoaHD(hd.idhopDong, nv.idnhanVien)}
+                        /></Button>)
+                }
+            })
+        })
+    }
+
     showDataTable = () => {
-        const { hds, hdid, hdky, hdbatdau, hdketthuc,nvs, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail,
-            nvtrangthaiHdthuViec, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
-            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvnganhhoc,
-            nvnoidaotao, nvxeploai, nvdantoc, nvdaotao } = this.state
+        const { hds, nvs } = this.state
         //let addModalClose = () => this.setState({ addModalShow: false })
         //let editModalClose = () => this.setState({ editModalShow: false })
         //let showModalClose = () => this.setState({ showModalShow: false })
@@ -142,37 +205,81 @@ export class AppXemHDThuViec extends Component {
         // var hientai = ngay + "-" + thang + "-" + nam
         var DMY = format(new Date(), 'yyyy-MM-dd')
         //console.log(DMY)
-        return hds.map((hd, index) => {
-            return nvs.map(nv =>{
-                if (hd.idloaiHd == 10 
-                    && hd.idnhanVien == nv.idnhanVien
-                    && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
-                    && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0,10)), new Date(DMY))) <0) 
+        return hds.map(hd => {
+            return nvs.map(nv => {
+                if (this.state.chonRadio == "Chưa hủy"
+                    && hd.ghiChu == "Ký"
+                ) {
+                    if (hd.idloaiHd == 10
+                        && hd.idnhanVien == nv.idnhanVien
+                        && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+                        && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))) < 0)
                     ) {
-                    return (
-                        <StyledTableRow key={hd.idhopDong}>
-                            <StyledTableCell>{index +1}</StyledTableCell>
-                            <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayLapHd),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayBatDau),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayHetHan),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell >Đã hết hạn</StyledTableCell>
-                        </StyledTableRow>)}
-                else if(hd.idloaiHd == 10 
-                    && hd.idnhanVien == nv.idnhanVien
-                    && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
-                    && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0,10)), new Date(DMY))) >0) 
-                    ){
-                    return (
-                        <StyledTableRow key={hd.idhopDong}>
-                            <StyledTableCell>{index + 1}</StyledTableCell>
-                            <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayLapHd),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayBatDau),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>{format(new Date(hd.ngayHetHan),'dd-MM-yyyy')}</StyledTableCell>
-                            <StyledTableCell>Còn lại {differenceInDays(new Date(hd.ngayHetHan.substring(0,10)), new Date(DMY))} ngày</StyledTableCell>
-                        </StyledTableRow>)
+                        return (
+                            <StyledTableRow>
+                                {/* <StyledTableCell>{index +1}</StyledTableCell> */}
+                                <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayLapHd), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell >Đã hết hạn</StyledTableCell>
+                            </StyledTableRow>)
+                    }
+                    else if (hd.idloaiHd == 10
+                        && hd.idnhanVien == nv.idnhanVien
+                        && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+                        && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))) > 0)
+                    ) {
+                        return (
+                            <StyledTableRow>
+                                {/* <StyledTableCell>{index + 1}</StyledTableCell> */}
+                                <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayLapHd), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
+                                <StyledTableCell>Còn lại {differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))} ngày</StyledTableCell>
+                            </StyledTableRow>)
+                    }
+                } ////////// Click Radio Đã hủy hđ
+                else {
+                    if (this.state.chonRadio == "Đã hủy"
+                        && hd.ghiChu == "Hủy"
+                    ) {
+                        if (hd.idloaiHd == 10
+                            && hd.idnhanVien == nv.idnhanVien
+                            && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+                            && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))) < 0)
+                        ) {
+                            return (
+                                <StyledTableRow>
+                                    {/* <StyledTableCell>{index +1}</StyledTableCell> */}
+                                    <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayLapHd), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell >Đã hết hạn</StyledTableCell>
+                                    <StyledTableCell >{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
+                                </StyledTableRow>)
+                        }
+                        else if (hd.idloaiHd == 10
+                            && hd.idnhanVien == nv.idnhanVien
+                            && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+                            && (parseInt(differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))) > 0)
+                        ) {
+                            return (
+                                <StyledTableRow>
+                                    {/* <StyledTableCell>{index + 1}</StyledTableCell> */}
+                                    <StyledTableCell>{this.layTenNV(hd.idnhanVien)}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayLapHd), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
+                                    <StyledTableCell>Còn lại {differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))} ngày</StyledTableCell>
+                                    <StyledTableCell >{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
+                                </StyledTableRow>)
+                        }
+                    }
                 }
+
             })
         })
     }
@@ -181,28 +288,44 @@ export class AppXemHDThuViec extends Component {
         return (
             <div>
                 <div className="container text-center">
-                    <h2 className="display-7">DANH SÁCH HỢP ĐỒNG THỬ VIỆC</h2><hr/>
+                    <h2 className="display-7">DANH SÁCH HỢP ĐỒNG THỬ VIỆC</h2><hr />
                 </div>
 
-                <Form.Label>Chọn phòng ban: </Form.Label>
-                {this.selectPB()}
+                <Row>
+                    <Col sm={4}>
+                        <label>Chọn xem danh sách nhân viên</label>
+                        <RadioGroup
+                            //name="gender1"
+                            value={this.state.chonRadio}
+                            onChange={this.handleChangeCheck}
+                        >
+                            <FormControlLabel value="Chưa hủy" control={<Radio />} label="Chưa hủy hợp đồng" />
+                            <FormControlLabel value="Đã hủy" control={<Radio />} label="Đã hủy hợp đồng" />
+                        </RadioGroup>
+                    </Col>
+                    <Col sm={4}></Col>
+                    <Col sm={4}>
+                        <Form.Label>Chọn phòng ban: </Form.Label>
+                        {this.selectPB()}
+                    </Col>
+                </Row>
 
                 <TableContainer>
-                <StyledTable className="mt-3">
-                    <TableHead>
-                        <StyledTableRow>
-                            <StyledTableCell>#</StyledTableCell>
-                            <StyledTableCell>Họ tên nhân viên</StyledTableCell>
-                            <StyledTableCell>Ngày ký hợp đồng</StyledTableCell>
-                            <StyledTableCell>Ngày bắt đầu</StyledTableCell>
-                            <StyledTableCell>Ngày kết thúc</StyledTableCell>
-                            <StyledTableCell>Hạn hợp đồng</StyledTableCell>
-                        </StyledTableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.showDataTable()}
-                    </TableBody>
-                </StyledTable>
+                    <StyledTable className="mt-3">
+                        <TableHead>
+                            <StyledTableRow>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
+                                <StyledTableCell>Họ tên nhân viên</StyledTableCell>
+                                <StyledTableCell>Ngày ký hợp đồng</StyledTableCell>
+                                <StyledTableCell>Ngày bắt đầu</StyledTableCell>
+                                <StyledTableCell>Ngày kết thúc</StyledTableCell>
+                                <StyledTableCell>Hạn hợp đồng</StyledTableCell>
+                            </StyledTableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.showDataTable()}
+                        </TableBody>
+                    </StyledTable>
                 </TableContainer>
             </div>)
     }

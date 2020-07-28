@@ -49,7 +49,9 @@ export class Login extends Component {
 
     onLogin() {
         const { username, password } = this.state;
-     
+            if(this.state.isLogin == false){
+                alert('Tài khoản hoặc Mật khẩu không chính xác')
+            }
             for (let i = 0; i < this.state.taikhoans.length; i++) {
                 if (username === this.state.taikhoans[i].username && password === this.state.taikhoans[i].password) {
                     localStorage.setItem("token", this.createToken());
@@ -149,16 +151,16 @@ export class Login extends Component {
         return (
             <div className="login-wrap">
                 <div className="login-html">
-                    <input id="tab-1" type="radio" name="tab" className="sign-in" defaultChecked /><label htmlFor="tab-1" className="tab">Sign In</label>
-                    <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab">Sign Up</label>
+                    <input id="tab-1" type="radio" name="tab" className="sign-in" defaultChecked /><label htmlFor="tab-1" className="tab">Đăng nhập</label>
+                    <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab">Đăng ký</label>
                     <div className="login-form">
                         <div className="sign-in-htm">
                             <div className="group">
-                                <label htmlFor="user" className="label">Username</label>
+                                <label htmlFor="user" className="label">Tài khoản</label>
                                 <input name="username" type="text" className="input" value={this.state.username} onChange={this.onChange} />
                             </div>
                             <div className="group">
-                                <label htmlFor="pass" className="label">Password</label>
+                                <label htmlFor="pass" className="label">Mật khẩu</label>
                                 <input name="password" type="password" className="input" data-type="password" value={this.state.password} onChange={this.onChange} />
                             </div>
                             {/* <div className="group">
@@ -166,7 +168,7 @@ export class Login extends Component {
                                 <label htmlFor="check"><span className="icon" /> Keep me Signed in</label>
                             </div> */}
                             <div className="group">
-                                <input type="button" className="button" defaultValue="Sign In" onClick={this.onLogin} />
+                                <input type="button" className="button" defaultValue="Đăng nhập" onClick={this.onLogin} />
                             </div>
                             <div className="hr" />
                             {/* <div className="foot-lnk">
@@ -196,7 +198,7 @@ export class Login extends Component {
                             {/* </div> */}
                             <Form onSubmit={this.handleSubmit}>
                                 <Form.Group controlId="TKusername">
-                                    <Form.Label>USERNAME</Form.Label>
+                                    <Form.Label>Tài khoản</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="TKusername"
@@ -204,7 +206,7 @@ export class Login extends Component {
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="TKpassword">
-                                    <Form.Label>PASSWORD</Form.Label>
+                                    <Form.Label>Mật khẩu</Form.Label>
                                     <Form.Control
                                         type="password"
                                         name="TKpassword"
@@ -212,7 +214,7 @@ export class Login extends Component {
                                     />
                                 </Form.Group>
                                 <Form.Group controlId="TKmail">
-                                    <Form.Label>MAIL</Form.Label>
+                                    <Form.Label>Email</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="TKmail"

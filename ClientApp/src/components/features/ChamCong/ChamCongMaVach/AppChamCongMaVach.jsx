@@ -184,7 +184,7 @@ export class AppChamCongMaVach extends Component {
         let editModalClose = () => this.setState({ editModalShow: false })
 
         return this.state.rows.map((row, key) => {
-            
+
             return (
                 <tr >
                     <td>{key + 1}</td>
@@ -200,12 +200,12 @@ export class AppChamCongMaVach extends Component {
         //console.log(this.state.rows[0])
         var obj = Object.assign({}, [this.state.rows[0]]);
         //console.log(obj)
-        
+
         // for(let ii=0; ii< obj.length; ii++){
         //     console.log(obj[ii])
         // }
-        
-        
+
+
         // var table = document.getElementById("mytab");
         // //console.log(table)
         // //console.log(row.cells)
@@ -214,9 +214,9 @@ export class AppChamCongMaVach extends Component {
         //     //for (var j = 0, col; col = row.cells[j]; j++) {
         //         //console.log(table.rows[i])
         //         array+= table.rows[i].value
-                
+
         //     }
-            
+
         // //}
         // console.log(array)
     }
@@ -255,9 +255,9 @@ export class AppChamCongMaVach extends Component {
                                     color="primary"
                                     size="large"
                                     startIcon={<SaveIcon />}
-                                    onClick={()=>this.skButtonLuu()}>
+                                    onClick={() => this.skButtonLuu()}>
                                     Lưu
-                                    </Button>
+                                </Button>
                             </Col>
                         </Row>
                     </Col>
@@ -278,7 +278,7 @@ export class AppChamCongMaVach extends Component {
                     </tbody>
 
                 </Table>
-                
+
                 {/* <OutTable
                     data={this.state.rows}
                     columns={this.state.cols}

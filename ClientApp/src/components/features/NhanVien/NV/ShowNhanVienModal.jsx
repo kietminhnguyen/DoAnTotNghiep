@@ -1,13 +1,53 @@
 import React, { Component } from 'react';
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
+import { Modal, Row, Col, Form } from 'react-bootstrap';
+import { TextField, Button, FormControl, InputLabel, Select, MenuItem, Input } from "@material-ui/core";
+import { withStyles } from '@material-ui/core/styles';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AppCSS from '../../../../AppCSS.css'
 
+const StyledGioiTinh = withStyles((theme) => ({
+    root: {
+        minWidth: 120
+    },
+}))(TextField);
 
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
+const StyledNgay = withStyles((theme) => ({
+    root: {
+        width: 170
+    },
+}))(TextField);
 
+const StyledKeID = withStyles((theme) => ({
+    root: {
+        width: 255
+    },
+}))(TextField);
+
+const StyledHonNhan = withStyles((theme) => ({
+    root: {
+        width: 165
+    },
+}))(TextField);
+
+const StyledTrinhDo = withStyles((theme) => ({
+    root: {
+        width: 160
+    },
+}))(TextField);
+
+const StyledQuocTich = withStyles((theme) => ({
+    root: {
+        width: 125
+    },
+}))(TextField);
+
+const StyledChoO = withStyles((theme) => ({
+    root: {
+        width: 315
+    },
+}))(TextField);
 
 export class ShowNhanVienModal extends Component {
-    //static displayName = EditPhongbanModal.name;
 
     constructor(props) {
         super(props);
@@ -17,6 +57,13 @@ export class ShowNhanVienModal extends Component {
             daotaos: [],
             cvs: [],
         };
+    }
+
+    componentDidMount() {
+        this.loadPhongBan()
+        this.loadDanToc()
+        this.loadDaoTao()
+        this.loadChucVu()
     }
 
     loadPhongBan() {
@@ -51,293 +98,413 @@ export class ShowNhanVienModal extends Component {
             })
     }
 
-    componentDidMount() {
-        this.loadPhongBan()
-        this.loadDanToc()
-        this.loadDaoTao()
-        this.loadChucVu()
+    layTenDanToc(id) {
+        for (let i = 0; i < this.state.dts.length; i++) {
+            if (id == this.state.dts[i].iddanToc) {
+                id = this.state.dts[i].tenDanToc
+            }
+        }
+        return id
     }
 
+    layTenTrinhDo(id) {
+        for (let i = 0; i < this.state.daotaos.length; i++) {
+            if (id == this.state.daotaos[i].idtrinhDo) {
+                id = this.state.daotaos[i].tenTrinhDo
+            }
+        }
+        return id
+    }
+
+    layTenPhongBan(id) {
+        for (let i = 0; i < this.state.pbs.length; i++) {
+            if (id == this.state.pbs[i].idphongBan) {
+                id = this.state.pbs[i].tenPhongBan
+            }
+        }
+        return id
+    }
+
+    layTenChucVu(id) {
+        for (let i = 0; i < this.state.cvs.length; i++) {
+            if (id == this.state.cvs[i].idchucVu) {
+                id = this.state.cvs[i].tenChucVu
+            }
+        }
+        return id
+    }
+
+    showModalBody() {
+        return (
+            <Form>
+                <Row>
+                    <Col sm={12}>
+                        <Row className="mt-1">
+                            <Col sm={3}>
+                                <img
+                                    src={this.props.nvpic}
+                                    srcSet={this.state.url}
+                                    className="ml-5"
+                                    height="100px"
+                                    width="100px"
+                                />
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    name="NhanvienID"
+                                    size="small"
+                                    variant="outlined"
+                                    label="ID nhân viên"
+                                    defaultValue={this.props.nvid}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={3} className="mt-3">
+                                <StyledKeID
+                                    name="NhanvienHO"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Họ đệm"
+                                    defaultValue={this.props.nvho}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    name="NhanvienTEN"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tên"
+                                    defaultValue={this.props.nvten}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></TextField>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <StyledGioiTinh
+                                    name="NhanvienGIOITINH"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Giới tính"
+                                    defaultValue={this.props.nvgioitinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledGioiTinh>
+                            </Col>
+                        </Row>
+
+                        <Row className="mb-3">
+                            <Col sm={3}>
+                                <label className="btn btn-link btn-sm ml-5">
+                                    CHỌN HÌNH<input type="file" hidden disabled
+                                        name="NhanvienHINH"
+                                    //onChange={(event) => this.handleChange(event)}
+                                    ></input>
+                                </label>
+                            </Col>
+                            <Col sm={2}>
+                                <StyledNgay
+                                    name="NhanvienNgaySinh"
+                                    size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Ngày Sinh"
+                                    defaultValue={this.props.nvngaysinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledKeID
+                                    name="NhanvienNoiSinh"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Nơi sinh"
+                                    defaultValue={this.props.nvnoisinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2}>
+                                <TextField
+                                    name="NhanvienTonGiao"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tôn giáo"
+                                    defaultValue={this.props.nvtongiao}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={2}>
+                                <StyledGioiTinh
+                                    name="NhanvienDanToc"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Dân tộc"
+                                    defaultValue={this.layTenDanToc(this.props.nvdantoc)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledGioiTinh>
+                            </Col>
+                        </Row>
+                    </Col>
+
+                    <Col sm={12} className="ml-2">
+                        <Row className="mt-4 mb-5">
+                            <Col sm={2} >
+                                <TextField
+                                    name="NhanvienSDT"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Số điện thoại"
+                                    defaultValue={this.props.nvsdt}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={3} >
+                                <StyledKeID
+                                    name="NhanvienEmail"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Email"
+                                    defaultValue={this.props.nvmail}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} >
+                                <StyledHonNhan
+                                    name="NhanvienSoCMNN"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Số CMND"
+                                    defaultValue={this.props.nvsocmnd}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledHonNhan>
+                            </Col>
+                            <Col sm={2} >
+                                <StyledNgay
+                                    name="NhanvienNgNgayCapCMMM"
+                                    size="small"
+                                    type="date"
+                                    variant="outlined"
+                                    label="Ngày cấp CMND"
+                                    defaultValue={this.props.nvngaycap}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3} >
+                                <TextField
+                                    name="NhanvienNoiCap"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Nơi cấp CMND"
+                                    defaultValue={this.props.nvnoicap}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="mt-4 mb-3">
+                            <Col sm={2} >
+                                <StyledTrinhDo
+                                    //className="ml-2"
+                                    name="NhanvienTrinhDoDaoTao"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Trình độ"
+                                    defaultValue={this.layTenTrinhDo(this.props.nvdaotao)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledTrinhDo>
+                            </Col>
+                            <Col sm={3} >
+                                <StyledKeID
+                                    name="NhanvienPB"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Phòng ban"
+                                    defaultValue={this.layTenPhongBan(this.props.nvpb)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={3} >
+                                <StyledKeID
+                                    name="NhanvienCV"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Chức vụ"
+                                    defaultValue={this.layTenChucVu(this.props.nvcv)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} >
+                                <StyledHonNhan
+                                    name="NhanvienTinhTrangHonNhan"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tình trạng hôn nhân"
+                                    defaultValue={this.props.nvtinhtranghonnhan}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledHonNhan>
+                            </Col>
+                            <Col sm={2} >
+                                <StyledQuocTich
+                                    name="NhanvienQuocTich"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Quốc tịch"
+                                    defaultValue={this.props.nvquoctich}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledQuocTich>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+
+                <Row className="mb-4">
+                    <Col sm={2}></Col>
+                    <Col sm={3}></Col>
+                    <Col sm={3} className="mt-4 ml-1">
+                        <StyledKeID
+                            size="small"
+                            name="NhanvienDiaChi"
+                            variant="outlined"
+                            label="Địa chỉ thường trú"
+                            defaultValue={this.props.nvdcthuongtru}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        ></StyledKeID>
+                    </Col>
+                    <Col sm={3} className="mt-4 ml-1">
+                        <StyledChoO
+                            name="NhanvienChoOHienTai"
+                            size="small"
+                            variant="outlined"
+                            label="Chỗ ở hiện tại"
+                            defaultValue={this.props.nvchohientai}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        ></StyledChoO>
+                    </Col>
+                </Row>
+                <Row >
+                    <Col sm={2}></Col>
+                    <Col sm={3} className="mt-3 ml-1">
+                        <StyledKeID
+                            size="small"
+                            //name="NhanvienNoiDaoTao"
+                            variant="outlined"
+                            label="Trạng thái hợp đồng chính thức"
+                            defaultValue={this.props.nvchinhthuc}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        ></StyledKeID>
+                    </Col>
+                    <Col sm={3} className="mt-3 ml-1">
+                        <StyledKeID
+                            size="small"
+                            //name="NhanvienNoiDaoTao"
+                            variant="outlined"
+                            label="Trạng thái hợp đồng thử việc"
+                            defaultValue={this.props.nvthuviec}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        ></StyledKeID>
+                    </Col>
+                    <Col sm={3} className="mt-3 ml-1">
+                        <StyledKeID
+                            size="small"
+                            //name="NhanvienNoiDaoTao"
+                            variant="outlined"
+                            label="Trạng thái bổ nhiệm"
+                            defaultValue={this.props.nvnoidaotao}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        ></StyledKeID>
+                    </Col>
+                    <Col sm={1}></Col>
+                </Row>
+            </Form>
+        )
+    }
 
     render() {
         return (
             <div className="container">
                 <Modal
                     {...this.props}
-                    size="lg"
+                    size="xl"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="contained-modal-title-vcenter">
-                            Thông tin nhân viên
+                        THÔNG TIN NHÂN VIÊN
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Row >
-                            <Col sm={12} >
-                                <Form>
-                                    <Row >
-                                        {/* CỘT THỨ 1 */}
-                                        <Col sm={3}>
 
-                                            <Form.Group controlId="NhanvienID">
-                                                <Form.Label>ID nhân viên</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienID"
-                                                    disabled
-                                                    defaultValue={this.props.nvid}
-                                                />
-                                            </Form.Group>
+                        {this.showModalBody()}
 
-                                            <Form.Group controlId="NhanvienPB">
-                                                <Form.Label>Thuộc phòng ban</Form.Label>
-                                                <Form.Control as="select" defaultValue={this.props.nvpb} disabled>
-                                                    {this.state.pbs.map(pb =>
-                                                        <option key={pb.idphongBan} value={pb.idphongBan}>{pb.tenPhongBan}</option>)}
-                                                </Form.Control>
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienCV">
-                                                <Form.Label>Chức vụ</Form.Label>
-                                                <Form.Control as="select" defaultValue={this.props.nvcv} disabled>
-                                                    {this.state.cvs.map(cv =>
-                                                        <option key={cv.idchucVu} value={cv.idchucVu}>{cv.tenChucVu}</option>)}
-                                                </Form.Control>
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienSoCMNN">
-                                                <Form.Label>Số CMNN</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienSoCMNN"
-                                                    disabled
-                                                    defaultValue={this.props.nvsocmnd}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienDanToc">
-                                                <Form.Label>Dân Tộc</Form.Label>
-                                                <Form.Control as="select" defaultValue={this.props.nvdantoc} disabled>
-                                                    {this.state.dts.map(dt =>
-                                                        <option key={dt.iddanToc} value={dt.iddanToc}>{dt.tenDanToc}</option>)}
-                                                </Form.Control>
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienTrinhDoDaoTao">
-                                                <Form.Label>Trình độ đào tạo</Form.Label>
-                                                <Form.Control as="select" defaultValue={this.props.nvdaotao} disabled>
-                                                    {this.state.daotaos.map(dt2 =>
-                                                        <option key={dt2.idtrinhDo} value={dt2.idtrinhDo}>{dt2.tenTrinhDo}</option>)}
-                                                </Form.Control>
-                                            </Form.Group>
-
-                                        </Col>
-
-                                        {/* CỘT THỨ 2 */}
-                                        <Col sm={3}>
-
-                                            <Form.Group controlId="NhanvienHO">
-                                                <Form.Label>Họ đệm</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienHO"
-                                                    disabled
-                                                    defaultValue={this.props.nvho}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienNgaySinh">
-                                                <Form.Label>Ngày Sinh</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    name="NhanvienNgaySinh"
-                                                    disabled
-                                                    defaultValue={this.props.nvngaysinh}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienGIOITINH">
-                                                <Form.Label>Giới tính</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienGIOITINH"
-                                                    disabled
-                                                    defaultValue={this.props.nvgioitinh}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienNgNgayCapCMMM">
-                                                <Form.Label>Ngày Cấp CMNN</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    name="NhanvienNgNgayCapCMMM"
-                                                    disabled
-                                                    defaultValue={this.props.nvngaycap}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienSDT">
-                                                <Form.Label>Số điện thoại</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienSDT"
-                                                    disabled
-                                                    defaultValue={this.props.nvsdt}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienHDCT">
-                                                <Form.Label>Hợp đồng chính thức</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienHDCT"
-                                                    disabled
-                                                    defaultValue={this.props.nvtrangthaiHdchinhThuc}
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-
-                                        {/* CỘT THỨ 3 */}
-                                        <Col sm={2}>
-
-                                            <Form.Group controlId="NhanvienTEN">
-                                                <Form.Label>Tên</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienTEN"
-                                                    disabled
-                                                    defaultValue={this.props.nvten}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienTonGiao">
-                                                <Form.Label>Tôn giáo</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienTonGiao"
-                                                    disabled
-                                                    defaultValue={this.props.nvtongiao}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienNoiCap">
-                                                <Form.Label>Nơi cấp </Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienNoiCap"
-                                                    disabled
-                                                    defaultValue={this.props.nvnoicap}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienXepLoai">
-                                                <Form.Label>Xếp loại</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienXepLoai"
-                                                    disabled
-                                                    defaultValue={this.props.nvxeploai}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienQuocTich">
-                                                <Form.Label>Quốc tịch</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienQuocTich"
-                                                    disabled
-                                                    defaultValue={this.props.nvquoctich}
-                                                />
-
-                                            </Form.Group>
-                                       
-                                            <Form.Group controlId="NhanvienHDTV">
-                                                <Form.Label>Hợp đồng thử việc</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienHDTV"
-                                                    disabled
-                                                    defaultValue={this.props.nvtrangthaiHdthuViec}
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-
-                                        {/* CỘT THỨ 4 */}
-                                        <Col sm={4}>
-
-                                            <Form.Group controlId="NhanvienDiaChi">
-                                                <Form.Label>Địa chỉ thường trú</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienDiaChi"
-                                                    disabled
-                                                    defaultValue={this.props.nvdcthuongtru}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienChoOHienTai">
-                                                <Form.Label>Chỗ ở hiện tại</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienChoOHienTai"
-                                                    disabled
-                                                    defaultValue={this.props.nvchohientai}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienEmail">
-                                                <Form.Label>Email</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienEmail"
-                                                    disabled
-                                                    defaultValue={this.props.nvmail}
-                                                />
-                                            </Form.Group>                
-
-                                            <Form.Group controlId="NhanvienNoiSinh">
-                                                <Form.Label>Nơi sinh</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienNoiSinh"
-                                                    disabled
-                                                    defaultValue={this.props.nvnoisinh}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienTinhTrangHonNhan">
-                                                <Form.Label>Tình trạng hôn nhân</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienTinhTrangHonNhan"
-                                                    disabled
-                                                    defaultValue={this.props.nvtinhtranghonnhan}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group controlId="NhanvienNoiDaoTao">
-                                                <Form.Label>Trạng thái bổ nhiệm</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="NhanvienNoiDaoTao"
-                                                    disabled
-                                                    defaultValue={this.props.nvnoidaotao}
-                                                />
-                                            </Form.Group>
-
-                                        </Col>
-
-                                    </Row>
-                                </Form>
-                            </Col>
-                        </Row>
                     </Modal.Body>
+
                     <Modal.Footer>
-                        <Button className="btn btn-block btn-secondary" onClick={this.props.onHide}>Đóng</Button>
+                        <Button
+                            className="mr-3"
+                            variant="contained"
+                            color="inherit"
+                            startIcon={<CancelIcon />}
+                            onClick={this.props.onHide}
+                        >Đóng</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

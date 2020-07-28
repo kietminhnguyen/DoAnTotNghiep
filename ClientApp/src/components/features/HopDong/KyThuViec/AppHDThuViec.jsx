@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 //import { Button, ButtonToolbar, Table, Form } from 'react-bootstrap'
-import { Form} from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, ButtonGroup, Button, Select, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import EditIcon from "@material-ui/icons/Edit"
 import DeleteIcon from "@material-ui/icons/Delete"
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
 
 import { AddHDThuViecModal } from './AddHDThuViecModal'
 import { ShowHDThuViecModal } from './ShowHDThuViecModal'
@@ -43,7 +44,6 @@ export class AppHDThuViec extends Component {
         super(props);
         this.state = {
             pbs: [],
-            hds: [],
             nvs: [],
             chonPB: '',
             addModalShow: false,
@@ -57,7 +57,6 @@ export class AppHDThuViec extends Component {
     componentDidMount() {
         this.loadNV()
         this.loadPB()
-        this.loadHD()
     }
 
     componentDidUpdate() {
@@ -81,37 +80,14 @@ export class AppHDThuViec extends Component {
             })
     }
 
-    loadHD() {
-        fetch('https://localhost:44390/api/hopdongs')
-            .then(respone => respone.json())
-            .then(data => {
-                this.setState({ hds: data })
-            })
-    }
-
     handleChange(event) {
         this.setState({
             chonPB: event.target.value
         })
     }
 
-    handleCloseSelect = () => {
-        this.setState({
-            setOpen: false
-        })
-    };
-
-    handleOpenSelect = () => {
-        this.setState({
-            setOpen: true
-        })
-    };
-
     selectPB = () => {
         return <Select className="ml-3"
-            //open={open}
-            onClose={this.handleCloseSelect}
-            onOpen={this.handleOpenSelect}
             value={this.state.chonPB}
             onChange={this.handleChange}>
             {
@@ -128,14 +104,14 @@ export class AppHDThuViec extends Component {
     showButtonKy(idnv) {
         return this.state.nvs.map(nv => {
             if (nv.trangthaiHdthuViec == null
-                && nv.noiDaoTao != null
+                && nv.noiDaoTao == "Bổ nhiệm"
                 && idnv == nv.idnhanVien
             ) {
                 return (
                     <Button
                         variant="contained"
-                        color="secondary"
-                        //startIcon={<NoEncryptionIcon />}
+                        color="primary"
+                        startIcon={<MenuBookIcon />}
                         onClick={() => this.setState({
                             addModalShow: true,
                             nvid: nv.idnhanVien,
@@ -162,7 +138,9 @@ export class AppHDThuViec extends Component {
                             nvdaotao: nv.idtrinhDo,
                             nvquoctich: nv.quocTich,
                             nvcv: nv.idchucVu,
-                            nvtrangthaiHdthuViec: nv.trangthaiHdthuViec
+                            nvthuviec: nv.trangthaiHdthuViec,
+                            nvhinh: nv.hinhAnh,
+                            nvqdbn: nv.idquyetDinhBn
                         })}
                     >Ký hợp đồng
                     </Button>)
@@ -172,24 +150,25 @@ export class AppHDThuViec extends Component {
 
     showDataTable = () => {
 
-        const { nvs, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail,
-            nvtrangthaiHdthuViec, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
-            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvnganhhoc,
-            nvnoidaotao, nvxeploai, nvdantoc, nvdaotao } = this.state
+        const { nvs, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail, nvhinh,
+            nvthuviec, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
+            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, 
+            nvnoidaotao, nvdantoc, nvdaotao, nvqdbn } = this.state
         let addModalClose = () => this.setState({ addModalShow: false })
         let showModalClose = () => this.setState({ showModalShow: false })
 
-        return nvs.map((nv, key) => {
-            if (nv.noiDaoTao != null
-                && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+        return nvs.map(nv => {
+            if (nv.noiDaoTao == "Bổ nhiệm"
+                && nv.idphongBan == this.state.chonPB
+                //|| this.state.chonPB == ''
             ) {
                 return (
-                    <StyledTableRow key={nv.idnhanVien}>
-                        <StyledTableCell>{key + 1}</StyledTableCell>
+                    <StyledTableRow>
+                        {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
                         <StyledTableCell>{nv.hoDem}</StyledTableCell>
                         <StyledTableCell>{nv.ten}</StyledTableCell>
                         <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
-                        <StyledTableCell align="right">{nv.soDienThoai}</StyledTableCell>
+                        <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
                         <StyledTableCell align="center">{nv.trangthaiHdthuViec}</StyledTableCell>
                         <StyledTableCell align="right">
 
@@ -223,7 +202,8 @@ export class AppHDThuViec extends Component {
                                         nvdaotao: nv.idtrinhDo,
                                         nvquoctich: nv.quocTich,
                                         nvcv: nv.idchucVu,
-                                        nvtrangthaiHdthuViec: nv.trangthaiHdthuViec
+                                        nvthuviec: nv.trangthaiHdthuViec,
+                                        nvhinh: nv.hinhAnh
                                     })}>
                                 </VisibilityIcon>
                             </Button>
@@ -248,15 +228,17 @@ export class AppHDThuViec extends Component {
                                 nvngaycap={nvngaycap}
                                 nvnoicap={nvnoicap}
                                 nvmail={nvmail}
-                                nvnganhhoc={nvnganhhoc}
+                                //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
-                                nvxeploai={nvxeploai}
+                                //nvxeploai={nvxeploai}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
                                 nvquoctich={nvquoctich}
                                 nvcv={nvcv}
-                                nvtrangthaiHdthuViec={nvtrangthaiHdthuViec}
+                                nvthuviec={nvthuviec}
+                                nvpic={nvhinh}
+                                nvqdbn={nvqdbn}
                             />
 
                             <ShowHDThuViecModal
@@ -278,18 +260,17 @@ export class AppHDThuViec extends Component {
                                 nvngaycap={nvngaycap}
                                 nvnoicap={nvnoicap}
                                 nvmail={nvmail}
-                                nvnganhhoc={nvnganhhoc}
+                                //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
-                                nvxeploai={nvxeploai}
+                                //nvxeploai={nvxeploai}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
                                 nvquoctich={nvquoctich}
                                 nvcv={nvcv}
-                                nvtrangthaiHdthuViec={nvtrangthaiHdthuViec}
+                                nvthuviec={nvthuviec}
+                                nvpic={nvhinh}
                             />
-
-
 
                         </StyledTableCell>
                     </StyledTableRow>)
@@ -312,16 +293,17 @@ export class AppHDThuViec extends Component {
                     <StyledTable className="mt-3">
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell>#</StyledTableCell>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
                                 <StyledTableCell>Họ đệm</StyledTableCell>
                                 <StyledTableCell>Tên</StyledTableCell>
-                                <StyledTableCell align="right">Giới tính</StyledTableCell>
-                                <StyledTableCell align="right">Số điện thoại</StyledTableCell>
-                                <StyledTableCell align="right">Trạng thái</StyledTableCell>
-                                <StyledTableCell align="center">Chức năng</StyledTableCell>
+                                <StyledTableCell align="center">Giới tính</StyledTableCell>
+                                <StyledTableCell align="center">Số điện thoại</StyledTableCell>
+                                <StyledTableCell align="center">Trạng thái</StyledTableCell>
+                                <StyledTableCell align="right">Chức năng</StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>
+
                             {this.showDataTable()}
 
                         </TableBody>

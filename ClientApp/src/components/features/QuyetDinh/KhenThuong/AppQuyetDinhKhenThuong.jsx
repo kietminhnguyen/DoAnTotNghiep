@@ -43,7 +43,8 @@ export class AppQuyetDinhKhenThuong extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            nhanviens:[],
+            bangluongs: [],
+            nhanviens: [],
             quyetdinhkts: [],
             ThangNamQuyetDinh: '',
             addModalShow: false,
@@ -56,6 +57,7 @@ export class AppQuyetDinhKhenThuong extends Component {
     componentDidMount() {
         this.loadKhenThuong()
         this.loadNV()
+        this.loadBangLuong()
     }
     componentDidUpdate() {
         this.loadKhenThuong()
@@ -78,17 +80,44 @@ export class AppQuyetDinhKhenThuong extends Component {
 
     }
 
+    loadBangLuong() {
+        fetch('https://localhost:44390/api/bangluongs')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ bangluongs: data });
+            });
+
+    }
+
     deleteQuyetDinh(idqd) {
-        if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
-            axios.delete('https://localhost:44390/api/quyetdinhkts/' + idqd)
-                .then(response => {
-                    //this.setState({ arrayBL: response.data })
-                    alert("Xóa thành công")
-                })
-                .catch(error => {
-                    //this.setState({ showError: "Lỗi post dữ liệu" })
-                    alert("Xóa không thành công")
-                })
+        let flag = false
+        // kiểm tra đã đỗ dữ liệu hay chưa
+        // nếu đỗ rồi sẽ không được xóa qdKT
+        for (let i = 0; i < this.state.bangluongs.length; i++) {
+            for (let j = 0; j < this.state.quyetdinhkts.length; j++) {
+                if (this.state.bangluongs[i].thang == this.state.quyetdinhkts[j].ngayHieuLuc.substring(5, 7)
+                    && this.state.bangluongs[i].nam == this.state.quyetdinhkts[j].ngayHieuLuc.substring(0, 4)
+                    && this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkts[j].idnhanVien
+                ) {
+                    flag = true
+                }
+            }
+        }
+        if (flag) {
+            alert("Đã khóa bảng lương không thể xóa")
+        }
+        else {
+            if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
+                axios.delete('https://localhost:44390/api/quyetdinhkts/' + idqd)
+                    .then(response => {
+                        //this.setState({ arrayBL: response.data })
+                        alert("Xóa thành công")
+                    })
+                    .catch(error => {
+                        //this.setState({ showError: "Lỗi post dữ liệu" })
+                        alert("Xóa không thành công")
+                    })
+            }
         }
     }
 
@@ -103,9 +132,9 @@ export class AppQuyetDinhKhenThuong extends Component {
         var layNam = getYear(new Date(values))
         var namThang = layNam + "-" + layThang
         var MY = format(new Date(namThang), 'yyyy-MM')
-        console.log("thang: " + namThang)
+        //console.log("thang: " + namThang)
         // console.log("nam: "+layNam)
-        console.log("thang nam format: " + MY)
+        //console.log("thang nam format: " + MY)
 
         this.setState({
             ThangNamQuyetDinh: MY
@@ -123,8 +152,8 @@ export class AppQuyetDinhKhenThuong extends Component {
     }
 
     getTableData() {
-        const { quyetdinhkts, qdidkt, qdidnv, qdhodem, qdtennv, qdten, qdtienthuong, qdngyathanhlap,
-            qdngayhieuluc, qdngayhethieuluc, qdnoidung, qdghichu } = this.state;
+        const { nhanviens, quyetdinhkts, qdidkt, qdidnv, qdhodem, qdtennv, qdten, qdtienthuong, qdngyathanhlap,
+            qdngayhieuluc, qdngayhethieuluc, qdnoidung, qdghichu, nvgioitinh, nvhinh } = this.state;
         let editModalClose = () => this.setState({ editModalShow: false })
 
         const formatter = new Intl.NumberFormat('de-DE', {
@@ -133,76 +162,83 @@ export class AppQuyetDinhKhenThuong extends Component {
             minimumFractionDigits: 0
         })
 
-        return quyetdinhkts.map((qd, key) => {
-            if ((qd.ngayHetHieuLuc.substring(0, 7) == this.state.ThangNamQuyetDinh)
-                || this.state.ThangNamQuyetDinh == ''
-            ) {
-                return (
-                    <StyledTableRow key={qd.idquyetDinhKt}>
-                        <StyledTableCell>{key + 1}</StyledTableCell>
-                        <StyledTableCell>{this.layTenNV(qd.idnhanVien)}</StyledTableCell>
-                        <StyledTableCell align="center">{format(new Date(qd.ngayLap), 'dd-MM-yyyy')}</StyledTableCell>
-                        <StyledTableCell align="center">{format(new Date(qd.ngayHieuLuc), 'dd-MM-yyyy')}</StyledTableCell>
-                        <StyledTableCell align="center">{format(new Date(qd.ngayHetHieuLuc), 'dd-MM-yyyy')}</StyledTableCell>
-                        <StyledTableCell align="center" >{qd.noiDung}</StyledTableCell>
-                        <StyledTableCell align="center">{formatter.format(qd.soTienThuong)}</StyledTableCell>
-                        <StyledTableCell align="center">
-                            <ButtonGroup variant="text">
-                                <Button>
-                                    <EditIcon color="primary"
-                                        onClick={() => this.setState({
-                                            editModalShow: true,
-                                            qdidkt: qd.idquyetDinhKt,
-                                            qdidnv: qd.idnhanVien,
-                                            qdhodem: qd.hoDem,
-                                            qdtennv: qd.ten,
-                                            qdten: qd.tenQuyetDinh,
-                                            qdtienthuong: qd.soTienThuong,
-                                            qdngyathanhlap: qd.ngayLap.substring(0, 10),
-                                            qdngayhieuluc: qd.ngayHieuLuc.substring(0, 10),
-                                            qdngayhethieuluc: qd.ngayHetHieuLuc.substring(0, 10),
-                                            qdnoidung: qd.noiDung,
-                                            qdghichu: qd.ghiChu
+        return quyetdinhkts.map(qd => {
+            return nhanviens.map(nv => {
+                if ((qd.ngayHetHieuLuc.substring(0, 7) == this.state.ThangNamQuyetDinh)
+                    && qd.idnhanVien == nv.idnhanVien
+                    //|| this.state.ThangNamQuyetDinh == ''
+                ) {
+                    return (
+                        <StyledTableRow >
+                            {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
+                            <StyledTableCell>{this.layTenNV(qd.idnhanVien)}</StyledTableCell>
+                            <StyledTableCell align="center">{format(new Date(qd.ngayLap), 'dd-MM-yyyy')}</StyledTableCell>
+                            <StyledTableCell align="center">{format(new Date(qd.ngayHieuLuc), 'dd-MM-yyyy')}</StyledTableCell>
+                            <StyledTableCell align="center">{format(new Date(qd.ngayHetHieuLuc), 'dd-MM-yyyy')}</StyledTableCell>
+                            <StyledTableCell align="center" >{qd.noiDung}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(qd.soTienThuong)}</StyledTableCell>
+                            <StyledTableCell align="center">
+                                <ButtonGroup variant="text">
+                                    <Button>
+                                        <EditIcon color="primary"
+                                            onClick={() => this.setState({
+                                                editModalShow: true,
+                                                qdidkt: qd.idquyetDinhKt,
+                                                qdidnv: qd.idnhanVien,
+                                                qdhodem: qd.hoDem,
+                                                qdtennv: qd.ten,
+                                                qdten: qd.tenQuyetDinh,
+                                                qdtienthuong: qd.soTienThuong,
+                                                qdngyathanhlap: qd.ngayLap.substring(0, 10),
+                                                qdngayhieuluc: qd.ngayHieuLuc.substring(0, 10),
+                                                qdngayhethieuluc: qd.ngayHetHieuLuc.substring(0, 10),
+                                                qdnoidung: qd.noiDung,
+                                                qdghichu: qd.ghiChu,
+                                                nvgioitinh: nv.gioiTinh,
+                                                nvhinh: nv.hinhAnh
+                                            })}>
+                                        </EditIcon>
+                                    </Button>
 
-                                        })}>
-                                    </EditIcon>
-                                </Button>
+                                    <Button>
+                                        <DeleteIcon color="secondary"
+                                            onClick={() => this.deleteQuyetDinh(qd.idquyetDinhKt)}>
+                                        </DeleteIcon>
+                                    </Button>
+                                    <Button>
+                                        <PrintIcon color="inherit"
+                                        //onClick={() => this.inquyetdinh()}
+                                        ></PrintIcon>
+                                    </Button>
 
-                                <Button>
-                                    <DeleteIcon color="secondary"
-                                        onClick={() => this.deleteQuyetDinh(qd.idquyetDinhKt)}>
-                                    </DeleteIcon>
-                                </Button>
-                                <Button>
-                                    <PrintIcon color="inherit"
-                                        onClick={() => this.inquyetdinh()}>
-                                    </PrintIcon>
-                                </Button>
+                                    <EditQuyetDinhKhenThuong
+                                        show={this.state.editModalShow}
+                                        onHide={editModalClose}
+                                        qdidkt={qdidkt}
+                                        qdidnv={qdidnv}
+                                        qdhodem={qdhodem}
+                                        qdtennv={qdtennv}
+                                        qdten={qdten}
+                                        qdtienthuong={qdtienthuong}
+                                        qdngyathanhlap={qdngyathanhlap}
+                                        qdngayhieuluc={qdngayhieuluc}
+                                        qdngayhethieuluc={qdngayhethieuluc}
+                                        qdnoidung={qdnoidung}
+                                        qdghichu={qdghichu}
+                                        nvgioitinh={nvgioitinh}
+                                        nvpic={nvhinh}
+                                    />
+                                </ButtonGroup>
+                            </StyledTableCell>
+                        </StyledTableRow>)
+                }
+            })
 
-                                <EditQuyetDinhKhenThuong
-                                    show={this.state.editModalShow}
-                                    onHide={editModalClose}
-                                    qdidkt={qdidkt}
-                                    qdidnv={qdidnv}
-                                    qdhodem={qdhodem}
-                                    qdtennv={qdtennv}
-                                    qdten={qdten}
-                                    qdtienthuong={qdtienthuong}
-                                    qdngyathanhlap={qdngyathanhlap}
-                                    qdngayhieuluc={qdngayhieuluc}
-                                    qdngayhethieuluc={qdngayhethieuluc}
-                                    qdnoidung={qdnoidung}
-                                    qdghichu={qdghichu}
-                                />
-                            </ButtonGroup>
-                        </StyledTableCell>
-                    </StyledTableRow>)
-            }
         })
     }
 
     render() {
-        
+
         return (
             <div>
                 <div className="container text-center">
@@ -228,7 +264,7 @@ export class AppQuyetDinhKhenThuong extends Component {
                     <StyledTable className="mt-3">
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell>#</StyledTableCell>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
                                 <StyledTableCell>Họ tên nhân viên</StyledTableCell>
                                 <StyledTableCell align="center">Ngày lập</StyledTableCell>
                                 <StyledTableCell align="center">Ngày hiệu lực</StyledTableCell>

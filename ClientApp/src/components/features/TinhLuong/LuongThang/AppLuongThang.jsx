@@ -10,7 +10,7 @@ import { format, differenceInDays, getMonth, getYear } from 'date-fns'
 import axios from 'axios';
 
 import { EditLuongThangModal } from './EditLuongThangModal'
-import { ShowLuongThangModal } from './ShowLuongThangModal'
+//import { ShowLuongThangModal } from './ShowLuongThangModal'
 
 
 const StyledTableCell = withStyles((theme) => ({
@@ -33,8 +33,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 const StyledTable = withStyles((theme) => ({
     root: {
-        minWidth: 1700,
-        border: 1
+        minWidth: 3000,
     },
 }))(Table);
 
@@ -139,60 +138,17 @@ export class AppLuongThang extends Component {
         var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
         var layNamDaChon = getYear(new Date(this.state.ThangNamChamCong))
         return this.state.bangluongs.map(bl => {
-            if (idbl == bl.idnhanVien
-                && layThangDaChon == parseInt(bl.thang)
-                && layNamDaChon == parseInt(bl.nam)
-                && bl.trangThai == null
-                && bl.phuCapKhac == 0
-            ) {
-                return (
-                    <Button>
-                        <ExposureIcon color="secondary"
-                            onClick={() => this.setState({
-                                editModalShow: true,
-                                idbangLuong: bl.idbangLuong,
-                                idnhanVien: bl.idnhanVien,
-                                thang: bl.thang,
-                                nam: bl.nam,
-                                mucLuong: bl.mucLuong,
-                                tienThuong: bl.tienThuong,
-                                tienPhatDiTre: bl.tienPhatDiTre,
-                                //tienThuongLe: bl.tienThuongLe,
-                                tongThuNhap: bl.tongThuNhap,
-                                //tienNgayNghi: bl.tienNgayNghi,
-                                tienPhat: bl.tienPhat,
-                                tongGioTangCa: bl.tongGioTangCa,
-                                tienTangCa: bl.tienTangCa,
-                                tienTamUng: bl.tienTamUng,
-                                phuCapKhac: bl.phuCapKhac,
-                                truBh: bl.truBh,
-                                soNgayCong: bl.soNgayCong,
-                                soNgayDiTre: bl.soNgayDiTre,
-                                soNgayDiTreKhongTinhLuong: bl.soNgayDiTreKhongTinhLuong,
-                                soNgayNghi: bl.soNgayNghi,
-                                ghiChu: bl.ghiChu,
-                                heSoChucVu: bl.heSoChucVu,
-                                heSoChuyenMon: bl.heSoChuyenMon,
-                                trangThai: bl.trangThai,
-                                soLuongChiuThue: bl.soLuongChiuThue,
-                                thueTncn: bl.thueTncn,
-                                tienThucLinh: bl.tienThucLinh,
-                                //idthuongLe: bl.idthuongLe
-                            })}
-                        >
-                        </ExposureIcon>
-                    </Button>)
-            }
-            else {
+            return this.state.nhanviens.map(nv => {
                 if (idbl == bl.idnhanVien
+                    && bl.idnhanVien == nv.idnhanVien
                     && layThangDaChon == parseInt(bl.thang)
                     && layNamDaChon == parseInt(bl.nam)
                     && bl.trangThai == null
-                    && bl.phuCapKhac != 0
+                    && bl.phuCapKhac == 0
                 ) {
                     return (
                         <Button>
-                            <ExposureIcon color="disabled"
+                            <ExposureIcon color="secondary"
                                 onClick={() => this.setState({
                                     editModalShow: true,
                                     idbangLuong: bl.idbangLuong,
@@ -222,13 +178,71 @@ export class AppLuongThang extends Component {
                                     soLuongChiuThue: bl.soLuongChiuThue,
                                     thueTncn: bl.thueTncn,
                                     tienThucLinh: bl.tienThucLinh,
-                                    //idthuongLe: bl.idthuongLe
+                                    //idthuongLe: bl.idthuongLe,
+                                    nvid: nv.idnhanVien,
+                                    nvhodem: nv.hoDem,
+                                    nvten: nv.ten,
+                                    nvgioitinh: nv.gioiTinh,
+                                    nvhinh: nv.hinhAnh
                                 })}
                             >
                             </ExposureIcon>
                         </Button>)
                 }
-            }
+                else {
+                    if (idbl == bl.idnhanVien
+                        && bl.idnhanVien == nv.idnhanVien
+                        && layThangDaChon == parseInt(bl.thang)
+                        && layNamDaChon == parseInt(bl.nam)
+                        && bl.trangThai == null
+                        && bl.phuCapKhac != 0
+                    ) {
+                        return (
+                            <Button>
+                                <ExposureIcon color="disabled"
+                                    onClick={() => this.setState({
+                                        editModalShow: true,
+                                        idbangLuong: bl.idbangLuong,
+                                        idnhanVien: bl.idnhanVien,
+                                        thang: bl.thang,
+                                        nam: bl.nam,
+                                        mucLuong: bl.mucLuong,
+                                        tienThuong: bl.tienThuong,
+                                        tienPhatDiTre: bl.tienPhatDiTre,
+                                        //tienThuongLe: bl.tienThuongLe,
+                                        tongThuNhap: bl.tongThuNhap,
+                                        //tienNgayNghi: bl.tienNgayNghi,
+                                        tienPhat: bl.tienPhat,
+                                        tongGioTangCa: bl.tongGioTangCa,
+                                        tienTangCa: bl.tienTangCa,
+                                        tienTamUng: bl.tienTamUng,
+                                        phuCapKhac: bl.phuCapKhac,
+                                        truBh: bl.truBh,
+                                        soNgayCong: bl.soNgayCong,
+                                        soNgayDiTre: bl.soNgayDiTre,
+                                        soNgayDiTreKhongTinhLuong: bl.soNgayDiTreKhongTinhLuong,
+                                        soNgayNghi: bl.soNgayNghi,
+                                        ghiChu: bl.ghiChu,
+                                        heSoChucVu: bl.heSoChucVu,
+                                        heSoChuyenMon: bl.heSoChuyenMon,
+                                        trangThai: bl.trangThai,
+                                        soLuongChiuThue: bl.soLuongChiuThue,
+                                        thueTncn: bl.thueTncn,
+                                        tienThucLinh: bl.tienThucLinh,
+                                        //idthuongLe: bl.idthuongLe,
+                                        nvid: nv.idnhanVien,
+                                        nvhodem: nv.hoDem,
+                                        nvten: nv.ten,
+                                        nvgioitinh: nv.gioiTinh,
+                                        nvhinh: nv.hinhAnh
+                                    })}
+                                >
+                                </ExposureIcon>
+                            </Button>)
+                    }
+                }
+            })
+
         })
     }
 
@@ -407,12 +421,13 @@ export class AppLuongThang extends Component {
 
     getTableData() {
         const { bangluongs, nhanviens, idbangLuong, tienThuong, tongThuNhap, tongGioTangCa, tienPhat, ghiChu,
-            tienTangCa, tienTamUng, phuCapKhac, truBh, soNgayCong, soNgayNghi, tienThucLinh, heSoChucVu, 
-            heSoChuyenMon, idnhanVien, thang, nam, trangThai, mucLuong, soLuongChiuThue, thueTncn, 
-            tienPhatDiTre, soNgayDiTre, soNgayDiTreKhongTinhLuong } = this.state
-        let addModalClose = () => this.setState({ addModalShow: false })
+            tienTangCa, tienTamUng, phuCapKhac, truBh, soNgayCong, soNgayNghi, tienThucLinh, heSoChucVu,
+            heSoChuyenMon, idnhanVien, thang, nam, trangThai, mucLuong, soLuongChiuThue, thueTncn,
+            tienPhatDiTre, soNgayDiTre, soNgayDiTreKhongTinhLuong,
+            nvid, nvten, nvhodem, nvgioitinh, nvhinh } = this.state
+        //let addModalClose = () => this.setState({ addModalShow: false })
         let editModalClose = () => this.setState({ editModalShow: false })
-        let showModalClose = () => this.setState({ showModalShow: false })
+        //let showModalClose = () => this.setState({ showModalShow: false })
 
         var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
         var layNamDaChon = getYear(new Date(this.state.ThangNamChamCong))
@@ -431,24 +446,34 @@ export class AppLuongThang extends Component {
             }
         }
         if (flag) {
-            return bangluongs.map((bl, key) => {
+            return bangluongs.map(bl => {
                 return nhanviens.map(nv => {
                     if (bl.idnhanVien == nv.idnhanVien
                         && (layThangDaChon == bl.thang)
                         && (layNamDaChon == bl.nam)
                     ) {
                         return (<StyledTableRow key={bl.thang}>
-                            <StyledTableCell component="th" scope="bl">{this.layTenNV(bl.idnhanVien)}</StyledTableCell>
+                            <StyledTableCell align="left">{this.layTenNV(bl.idnhanVien)}</StyledTableCell>
                             <StyledTableCell align="center">{bl.idnhanVien}</StyledTableCell>
-                            <StyledTableCell align="center">{formatter.format(bl.tienThuong)}</StyledTableCell>
-                            <StyledTableCell align="center">{formatter.format(bl.tienTamUng)}</StyledTableCell>
-                            <StyledTableCell align="center">{formatter.format(bl.tienPhat)}</StyledTableCell>
-                            <StyledTableCell align="center">{formatter.format(bl.ghiChu)}</StyledTableCell>
-                            <StyledTableCell align="center">{formatter.format(bl.truBh)}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.heSoChucVu}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.heSoChuyenMon}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.mucLuong)}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.soNgayDiTre}</StyledTableCell>
+                            <StyledTableCell align="center">{bl.soNgayDiTreKhongTinhLuong}</StyledTableCell>
                             <StyledTableCell align="center">{bl.soNgayNghi}</StyledTableCell>
                             <StyledTableCell align="center">{bl.soNgayCong}</StyledTableCell>
-                            {/* <StyledTableCell align="center">{formatter.format(bl.tienNgayNghi)}</StyledTableCell> */}
+                            <StyledTableCell align="center">{bl.tongGioTangCa}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienTangCa)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienPhatDiTre)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienPhat)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienTamUng)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.thueTncn)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.truBh)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.tienThuong)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(730000)}</StyledTableCell>
+                            <StyledTableCell align="center">{formatter.format(bl.phuCapKhac)}</StyledTableCell>
                             <StyledTableCell align="center">{formatter.format(bl.tienThucLinh)}</StyledTableCell>
+                            
                             <StyledTableCell align="right">
 
                                 {this.checkButtonThemPhuCap(bl.idnhanVien)}
@@ -483,6 +508,11 @@ export class AppLuongThang extends Component {
                                     soLuongChiuThue={soLuongChiuThue}
                                     thueTncn={thueTncn}
                                     tienThucLinh={tienThucLinh}
+                                    nvid={nvid}
+                                    nvhodem={nvhodem}
+                                    nvten={nvten}
+                                    nvgioitinh={nvgioitinh}
+                                    nvpic={nvhinh}
                                 >
                                 </EditLuongThangModal>
 
@@ -530,18 +560,27 @@ export class AppLuongThang extends Component {
                     <StyledTable>
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell>Họ tên</StyledTableCell>
-                                <StyledTableCell align="right">Mã nhân viên</StyledTableCell>
-                                <StyledTableCell align="right">Tiền khen thưởng</StyledTableCell>
+                            <StyledTableCell align="left">Họ tên</StyledTableCell>
+                                <StyledTableCell align="center">Mã nhân viên</StyledTableCell>
+                                <StyledTableCell align="center">Hệ số chức vụ</StyledTableCell>
+                                <StyledTableCell align="center">Hệ số chuyên môn</StyledTableCell>
+                                <StyledTableCell align="center">Mức lương</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày đi trễ ˂ 60 phút</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày đi trễ ≥ 60 phút</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày nghỉ</StyledTableCell>
+                                <StyledTableCell align="center">Số ngày công</StyledTableCell>
+                                <StyledTableCell align="center">Số giờ tăng ca</StyledTableCell>
+                                <StyledTableCell align="center">Tiền tăng ca</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phạt đi trễ</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phạt kỉ luật</StyledTableCell>
                                 <StyledTableCell align="center">Tiền ứng</StyledTableCell>
-                                <StyledTableCell align="center">Tiền phạt</StyledTableCell>
-                                <StyledTableCell align="center">Tiền phúc lợi</StyledTableCell>
-                                <StyledTableCell align="center">Tiền khấu trừ</StyledTableCell>
-                                <StyledTableCell align="right">Số ngày nghỉ</StyledTableCell>
-                                <StyledTableCell align="right">Số ngày công</StyledTableCell>
-                                {/* <StyledTableCell align="right">Tiền ngày nghĩ</StyledTableCell> */}
+                                <StyledTableCell align="center">Tiền thuế TNCN</StyledTableCell>
+                                <StyledTableCell align="center">Tiền bảo hiểm</StyledTableCell>
+                                <StyledTableCell align="center">Tiền khen thưởng</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phụ cấp</StyledTableCell>
+                                <StyledTableCell align="center">Tiền phụ cấp khác</StyledTableCell>
                                 <StyledTableCell align="center">Thực lĩnh</StyledTableCell>
-                                <StyledTableCell align="center">Chức năng</StyledTableCell>
+                                <StyledTableCell align="right">Chức năng</StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>

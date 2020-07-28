@@ -137,7 +137,7 @@ export class AppChamCongThuCong extends Component {
     }
 
     showTableData() {
-        const { hds, nhanviens, idnv, cchodem, ccten } = this.state;
+        const { hds, nhanviens, idnv, cchodem, ccten, nvgioitinh, nvsdt, nvpb, nvcv, nvhinh } = this.state;
         let addModalClose = () => this.setState({ addModalShow: false })
         let addModalCloseTangCa = () => this.setState({ addModalShowTangCa: false })
 
@@ -148,16 +148,17 @@ export class AppChamCongThuCong extends Component {
         // var hientai = nam + "-" + thang + "-" + ngay
         var DMY = format(new Date(), 'yyyy-MM-dd')
 
-        return nhanviens.map((nv, key) => {
+        return nhanviens.map(nv => {
             return hds.map(hd => {
                 if (nv.idnhanVien == hd.idnhanVien
                     && nv.trangthaiHdchinhThuc != null
                     && differenceInDays(new Date(hd.ngayHetHan), new Date(DMY)) >= 0
-                    && (nv.idphongBan == this.state.chonPB || this.state.chonPB == '')
+                    && nv.idphongBan == this.state.chonPB 
+                        //|| this.state.chonPB == '')
                 ) {
                     return (
-                        <StyledTableRow key={nv.idnhanVien}>
-                            <StyledTableCell>{key + 1}</StyledTableCell>
+                        <StyledTableRow>
+                            {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
                             <StyledTableCell>{nv.hoDem}</StyledTableCell>
                             <StyledTableCell>{nv.ten}</StyledTableCell>
                             <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
@@ -175,6 +176,11 @@ export class AppChamCongThuCong extends Component {
                                         idnv: nv.idnhanVien,
                                         cchodem: nv.hoDem,
                                         ccten: nv.ten,
+                                        nvgioitinh: nv.gioiTinh,
+                                        nvsdt: nv.soDienThoai,
+                                        nvpb: nv.idphongBan,
+                                        nvcv: nv.idchucVu,
+                                        nvhinh: nv.hinhAnh,
                                     })}>Chấm Công
                                     </Button>
 
@@ -189,6 +195,11 @@ export class AppChamCongThuCong extends Component {
                                         idnv: nv.idnhanVien,
                                         cchodem: nv.hoDem,
                                         ccten: nv.ten,
+                                        nvgioitinh: nv.gioiTinh,
+                                        nvsdt: nv.soDienThoai,
+                                        nvpb: nv.idphongBan,
+                                        nvcv: nv.idchucVu,
+                                        nvhinh: nv.hinhAnh,
                                     })}>Tăng Ca
                                     </Button>
 
@@ -198,6 +209,11 @@ export class AppChamCongThuCong extends Component {
                                     idnv={idnv}
                                     cchodem={cchodem}
                                     ccten={ccten}
+                                    nvgioitinh={nvgioitinh}
+                                    nvsdt={nvsdt}
+                                    nvpb={nvpb}
+                                    nvcv={nvcv}
+                                    nvpic={nvhinh}
                                 />
 
                                 <AddChamCongTangCa
@@ -206,9 +222,12 @@ export class AppChamCongThuCong extends Component {
                                     idnv={idnv}
                                     cchodem={cchodem}
                                     ccten={ccten}
+                                    nvgioitinh={nvgioitinh}
+                                    nvsdt={nvsdt}
+                                    nvpb={nvpb}
+                                    nvcv={nvcv}
+                                    nvpic={nvhinh}
                                 />
-
-
                             </StyledTableCell>
                         </StyledTableRow>)
                 }
@@ -230,7 +249,7 @@ export class AppChamCongThuCong extends Component {
                     <StyledTable className="mt-3">
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell>#</StyledTableCell>
+                                {/* <StyledTableCell>#</StyledTableCell> */}
                                 <StyledTableCell>Họ đệm</StyledTableCell>
                                 <StyledTableCell>Tên</StyledTableCell>
                                 <StyledTableCell align="center">Giới tính</StyledTableCell>

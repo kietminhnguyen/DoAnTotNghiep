@@ -1,9 +1,42 @@
 import React, { Component } from 'react';
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
-import { format, differenceInDays, getDate } from 'date-fns';
+
+import { Modal, Row, Col, Form } from 'react-bootstrap';
+import { TextField, Button } from "@material-ui/core";
+import { withStyles } from '@material-ui/core/styles';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
+import CancelIcon from '@material-ui/icons/Cancel';
+import AppCSS from '../../../../AppCSS.css'
+
+import { format } from 'date-fns';
+import axios from 'axios'
 
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
+
+const StyledGioiTinh = withStyles((theme) => ({
+    root: {
+        minWidth: 120
+    },
+}))(TextField);
+
+const StyledNgay = withStyles((theme) => ({
+    root: {
+        width: 250
+    },
+}))(TextField);
+
+const StyledKeID = withStyles((theme) => ({
+    root: {
+        width: 255
+    },
+}))(TextField);
+
+const StyledRow3 = withStyles((theme) => ({
+    root: {
+        width: 250
+    },
+}))(TextField);
+
 
 export class AddChamCongTangCa extends Component {
     //static displayName = AddChamCongTangCa.name;
@@ -12,7 +45,12 @@ export class AddChamCongTangCa extends Component {
         super(props);
 
         this.state = {
-            chamcongs: [],
+            ChamCongNgay: format(new Date(), 'yyyy-MM-dd'),
+            chamcongtangcas: [],
+            nhanviens: [],
+            cvs: [],
+            pbs: [],
+
             snackbaropen: false,
             snackbarmsg: ''
         };
@@ -24,50 +62,255 @@ export class AddChamCongTangCa extends Component {
     };
 
     componentDidMount() {
-       
+        this.loadCCTC()
+        this.loadNV()
+        this.loadPhongBan()
+        this.loadChucVu()
     }
 
-    // getdatenow() {
-    //     var date = new Date()
-    //     var ngay = date.getDate()
-    //     var thang = date.getMonth() + 1
-    //     var nam = date.getFullYear()
-    //     var hientai = ngay + "-" + thang + "-" + nam
-    //     var DMY = format(new Date(hientai), 'dd-MM-yyyy')
-    //     console.log(DMY)
-    // }
+    loadPhongBan() {
+        fetch('https://localhost:44390/api/phongbans')
+            .then(respone => respone.json())
+            .then(data => {
+                this.setState({ pbs: data })
+            })
+    }
+
+    loadChucVu() {
+        fetch('https://localhost:44390/api/chucvus/')
+            .then(respone => respone.json())
+            .then(data => {
+                this.setState({ cvs: data })
+            })
+    }
+
+    loadCCTC() {
+        fetch('https://localhost:44390/api/chamcongtangcas')
+            .then(respone => respone.json())
+            .then(data => {
+                this.setState({ chamcongtangcas: data })
+            })
+    }
+
+    loadNV() {
+        fetch('https://localhost:44390/api/nhanviens')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ nhanviens: data });
+            });
+    }
+
     handleSubmit(event) {
         event.preventDefault();
-        fetch('https://localhost:44390/api/chamcongs', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                // idchamCong:  parseInt(event.target.NhanvienHO.value),
+
+        let co = false
+        for (let i = 0; i < this.state.chamcongtangcas.length; i++) {
+            //for(let j=0; j< this.state.nhanviens.length; j++){
+            if (this.state.chamcongtangcas[i].ngayChamCong.substring(0, 10) == this.state.ChamCongNgay
+                && parseInt(this.props.idnv) == parseInt(this.state.chamcongtangcas[i].idnhanVien)) {
+                co = true
+            }
+        }
+        if (co) {
+            alert("Ngày này đã chấm công")
+        } else {
+            axios.post('https://localhost:44390/api/chamcongtangcas', {
                 ngayChamCong: event.target.ChamCongNgay.value,
                 gioVao: event.target.ChamCongGioVao.value,
                 gioRa: event.target.ChamCongGioRa.value,
-                ghiChu: event.target.ChamCongGhiChu.value,
+                //ghiChu: event.target.ChamCongGhiChu.value,
                 idnhanVien: parseInt(this.props.idnv)
             })
-        })
-            .then(res => res.json())
-            .then(() => {
-               
-                this.setState({ snackbaropen: true, snackbarmsg: "Thêm thành công" });
-            })
+            alert("Thành công")
+        }
 
     }
 
+    layTenPhongBan(id) {
+        for (let i = 0; i < this.state.pbs.length; i++) {
+            if (id == this.state.pbs[i].idphongBan) {
+                id = this.state.pbs[i].tenPhongBan
+            }
+        }
+        return id
+    }
+
+    layTenChucVu(id) {
+        for (let i = 0; i < this.state.cvs.length; i++) {
+            if (id == this.state.cvs[i].idchucVu) {
+                id = this.state.cvs[i].tenChucVu
+            }
+        }
+        return id
+    }
+
+    showModalBody() {
+        return (
+            <Form onSubmit={this.handleSubmit}>
+                <Row>
+                    <Col sm={12}>
+                        <Row className="mt-1">
+                            <Col sm={3}>
+                                <img
+                                    src={this.props.nvpic}
+                                    //srcSet={this.state.url}
+                                    className="ml-5"
+                                    height="100px"
+                                    width="100px"
+                                />
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    //name="ChamCongID"
+                                    size="small"
+                                    variant="outlined"
+                                    label="ID nhân viên"
+                                    defaultValue={this.props.idnv}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </Col>
+                            <Col sm={3} className="mt-3">
+                                <StyledKeID
+                                    //name="QUYETDINHhodem"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Họ đệm"
+                                    defaultValue={this.props.cchodem}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledKeID>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <TextField
+                                    //name="QUYETDINHtennv"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Tên"
+                                    defaultValue={this.props.ccten}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></TextField>
+                            </Col>
+                            <Col sm={2} className="mt-3">
+                                <StyledGioiTinh
+                                    //name="NhanvienGIOITINH"
+                                    size="small"
+                                    variant="outlined"
+                                    //select
+                                    label="Giới tính"
+                                    defaultValue={this.props.nvgioitinh}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledGioiTinh>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3">
+                            <Col sm={3}></Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    //name="QUYETDINHngaylap"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Số điện thoại"
+                                    defaultValue={this.props.nvsdt}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    //name="QUYETDINHngayhieuluc"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Thuộc phòng ban"
+                                    defaultValue={this.layTenPhongBan(this.props.nvpb)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                            <Col sm={3}>
+                                <StyledNgay
+                                    //name="QUYETDINHngayhethieuluc"
+                                    size="small"
+                                    variant="outlined"
+                                    label="Chức vụ"
+                                    defaultValue={this.layTenChucVu(this.props.nvcv)}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledNgay>
+                            </Col>
+                        </Row>
+
+                        <Row >
+                            <Col sm={2}></Col>
+                            <Col sm={3} className="mt-4">
+                                <StyledRow3
+                                    type="date"
+                                    name="ChamCongNgay"
+                                    //size="small"
+                                    variant="outlined"
+                                    label="Ngày chấm công"
+                                    defaultValue={this.state.ChamCongNgay}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                ></StyledRow3>
+                            </Col>
+                            <Col sm={3} className="mt-4">
+                                <StyledRow3
+                                    type="time"
+                                    name="ChamCongGioVao"
+                                    //size="small"
+                                    variant="outlined"
+                                    label="Giờ vào"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                ></StyledRow3>
+                            </Col>
+                            <Col sm={3} className="mt-4">
+                                <StyledRow3
+                                    type="time"
+                                    name="ChamCongGioRa"
+                                    //size="small"
+                                    variant="outlined"
+                                    label="Giờ ra"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                ></StyledRow3>
+                            </Col>
+                            <Col sm={1}></Col>
+                        </Row>
+                    </Col>
+                </Row>
+                <Row className="mt-4"></Row>
+                <hr />
+                <Row>
+                    <Col sm={2}>
+                        <Button
+                            className="ml-2"
+                            variant="contained"
+                            color="primary"
+                            type="submit"
+                            startIcon={<DoneAllIcon />}
+                            onClick={this.props.onHide}
+                        >XÁC NHẬN</Button>
+                    </Col>
+                </Row>
+            </Form>
+        )
+    }
+
     render() {
-        var date = new Date()
-        var ngay = date.getDate()
-        var thang = date.getMonth() + 1
-        var nam = date.getFullYear()
-        var hientai = ngay + "-" + thang + "-" + nam
-        var DMY = format(new Date(), 'yyyy-MM-dd')
         return (
             <div className="container">
                 <Snackbar
@@ -86,117 +329,26 @@ export class AddChamCongTangCa extends Component {
 
                 <Modal
                     {...this.props}
-                    size="lg"
+                    size="xl"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="contained-modal-title-vcenter">
-                            Chấm công thủ công tăng ca
+                            CHẤM CÔNG TĂNG CA THỦ CÔNG
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Row >
-                            <Col sm={12} >
-                                <Form onSubmit={this.handleSubmit}>
-                                    <Row >
-                                        <Col>
-                                            <Row>
-                                                <Col sm={4}>
-                                                    <Form.Group controlId="ChamCongNgay">
-                                                        <Form.Label>Ngày Chấm Công</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongNgay"
-                                                            required
-                                                            disabled
-                                                            defaultValue={DMY}
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={4}>
-                                                    <Form.Group controlId="ChamCongHoDem">
-                                                        <Form.Label>Họ đệm</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongHoDem"
-                                                            required
-                                                            disabled
-                                                            defaultValue={this.props.cchodem}
-                                                            placeholder="Họ đệm nhân viên"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={4}>
-                                                <Form.Group controlId="ChamCongTen">
-                                                        <Form.Label>Tên</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="ChamCongTen"
-                                                            required
-                                                            disabled
-                                                            defaultValue={this.props.ccten}
-                                                            placeholder="Tên nhân viên"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <Col sm={6}>
-                                                <Form.Group controlId="ChamCongGioVao">
-                                                        <Form.Label>Giờ Vào</Form.Label>
-                                                        <Form.Control
-                                                            type="time"
-                                                            name="ChamCongGioVao"
-                                                            required
-                                                            //defaultValue={this.props.ccgiovao}
-                                                            placeholder="Giờ Vào"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-
-                                                <Col sm={6}>
-                                                <Form.Group controlId="ChamCongGioRa">
-                                                        <Form.Label>Giờ Ra</Form.Label>
-                                                        <Form.Control
-                                                            type="time"
-                                                            name="ChamCongGioRa"
-                                                            required
-                                                            //defaultValue={this.props.ccgiora}
-                                                            placeholder="Giờ Ra"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
-                                            </Row>
-                                            <Row>
-                                                <Col sm={12}>
-                                                <Form.Group controlId="ChamCongGhiChu">
-                                                <Form.Label>Ghi Chú</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="ChamCongGhiChu"
-                                                    required
-                                                    defaultValue={this.props.ccghichu}
-                                                    placeholder="Ghi Chú"
-                                                />
-                                            </Form.Group>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-                                    </Row>
-                                    <Form.Group>
-                                        <Button variant="info" type="submit">
-                                            Chấm Công
-                                        </Button>
-                                    </Form.Group>
-                                </Form>
-                            </Col>
-                        </Row>
+                        {this.showModalBody()}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button className="btn btn-block btn-secondary" onClick={this.props.onHide}>Đóng</Button>
+                        <Button
+                            className="mr-3"
+                            variant="contained"
+                            color="inherit"
+                            startIcon={<CancelIcon />}
+                            onClick={this.props.onHide}
+                        >Đóng</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

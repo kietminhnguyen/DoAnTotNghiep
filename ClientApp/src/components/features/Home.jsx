@@ -6,7 +6,7 @@ export class Home extends Component {
   render() {
     return (
       <div>
-        <img src="assets/images/hinhnen.jpg"/>
+        <img width="100%" height="20%" src="assets/images/nen.jpg"/>
         {/* <h1>HRMO: QUẢN LÝ NHÂN SỰ</h1> */}
         <p/>
         <p>Welcome to your new single-page application, built with:</p>

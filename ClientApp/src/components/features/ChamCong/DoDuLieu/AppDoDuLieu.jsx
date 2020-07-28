@@ -9,31 +9,6 @@ import NoEncryptionIcon from '@material-ui/icons/NoEncryption';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import { functions } from 'firebase';
 
-const StyledTableCell = withStyles((theme) => ({
-    head: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-        fontSize: 17,
-    },
-    body: {
-        fontSize: 16,
-    },
-}))(TableCell);
-
-const StyledTableRow = withStyles((theme) => ({
-    root: {
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
-        },
-    },
-}))(TableRow);
-
-const StyledTable = withStyles((theme) => ({
-    root: {
-        minWidth: 600
-    },
-}))(Table);
-
 export class AppDoDuLieu extends Component {
     //static displayName = AppDoDuLieu.name;
 

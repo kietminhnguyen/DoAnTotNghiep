@@ -1,0 +1,29 @@
+.tieude{
+ text-align: center;
+}
+.dinhdang{
+    margin-top: 5rem;
+}
+.tenbieumau{
+    text-align: center;
+    font-weight: 600;
+}
+.noidung{
+    margin-left: 4rem;
+    margin-right: 4em;
+    line-height: 2;
+}
+.ngay{
+    margin-left: 30em;
+
+}
+.chungnhan{
+    margin-left: 8em;
+}
+.nguoikhai{
+    margin-left: 25em;
+}
+.page1{
+    padding-top: 5em;
+    font-family: 'Times New Roman', Times, serif;
+}

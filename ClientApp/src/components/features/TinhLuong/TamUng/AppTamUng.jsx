@@ -150,7 +150,7 @@ export class AppTamUng extends Component {
     }
 
     showTableData() {
-        const { hds, nhanviens, idnv, cchodem, ccten } = this.state;
+        const { hds, nhanviens, idnv, cchodem, ccten, nvgioitinh, nvhinh } = this.state;
         let addModalClose = () => this.setState({ addModalShow: false })
         //let addModalCloseTangCa = () => this.setState({ addModalShowTangCa: false })
 
@@ -162,15 +162,15 @@ export class AppTamUng extends Component {
         })
 
         return nhanviens.map(nv => {
-            return hds.map((hd, key) => {
+            return hds.map(hd => {
                 if (nv.idnhanVien == hd.idnhanVien
                     && nv.trangthaiHdchinhThuc != null //kt có phải là nv chính thức
                     && differenceInDays(new Date(hd.ngayHetHan), new Date(DMY)) > 30 //kt hd chính thức còn hạn
                     && (nv.idphongBan == this.state.idphongBan || this.state.idphongBan == "")
                 ) {
                     return (
-                        <StyledTableRow key={nv.idnhanVien}>
-                            <StyledTableCell>{key + 1}</StyledTableCell>
+                        <StyledTableRow>
+                            {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
                             <StyledTableCell>{this.layTenNV(nv.idnhanVien)}</StyledTableCell>
                             <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
                             <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
@@ -184,12 +184,14 @@ export class AppTamUng extends Component {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    //startIcon={<LocalAtmIcon />}
+                                    startIcon={<LocalAtmIcon />}
                                     onClick={() => this.setState({
                                         addModalShow: true,
                                         idnv: nv.idnhanVien,
                                         cchodem: nv.hoDem,
                                         ccten: nv.ten,
+                                        nvgioitinh: nv.gioiTinh,
+                                        nvhinh: nv.hinhAnh
                                     })}>Tạm ứng
                                 </Button>
 
@@ -199,6 +201,8 @@ export class AppTamUng extends Component {
                                     idnv={idnv}
                                     cchodem={cchodem}
                                     ccten={ccten}
+                                    nvgioitinh={nvgioitinh}
+                                    nvpic={nvhinh}
                                 />
 
                             </StyledTableCell>
@@ -223,14 +227,14 @@ export class AppTamUng extends Component {
                 <StyledTable className="mt-3">
                     <TableHead>
                         <StyledTableRow>
-                            <StyledTableCell>#</StyledTableCell>
+                            {/* <StyledTableCell>#</StyledTableCell> */}
                             <StyledTableCell>Họ Tên</StyledTableCell>
                             <StyledTableCell>Giới tính</StyledTableCell>
                             <StyledTableCell>Số điện thoại</StyledTableCell>
                             <StyledTableCell>Thuộc phòng ban</StyledTableCell>
                             <StyledTableCell>Hạn hợp đồng</StyledTableCell>
                             <StyledTableCell>Tháng này đã ứng</StyledTableCell>
-                            <StyledTableCell>Chức năng</StyledTableCell>
+                            <StyledTableCell align="center">Chức năng</StyledTableCell>
                         </StyledTableRow>
                     </TableHead>
                     <TableBody>
