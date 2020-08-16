@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, Row, Col, Form } from 'react-bootstrap';
 import { Button } from '@material-ui/core'
 import PrintIcon from '@material-ui/icons/Print';
-import CancelIcon from '@material-ui/icons/Cancel';
+//import CancelIcon from '@material-ui/icons/Cancel';
 
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 
 
-import nvstyle from './nvstyle.css';
+import nvstyle from '../nvstyle.css';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
-export class InNhanVienModal extends Component {
+export class InQuyetDinhKhenThong extends Component {
     //static displayName = EditPhongbanModal.name;
 
     constructor(props) {
@@ -32,10 +31,14 @@ export class InNhanVienModal extends Component {
         html2canvas(input)
             .then((canvas) => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF();
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                //pdf.internal.getNumberOfPages();
+                //pdf.addPage(600,2500);
+
+                //pdf.setPage(2);
                 pdf.addImage(imgData, 'JPEG', 0, 0);
-                // pdf.output('dataurlnewwindow');
-                pdf.save("download.pdf");
+                //pdf.output('dataurlnewwindow');
+                pdf.save("QuyetDinhKhenThuong.pdf");
             })
             ;
     }
@@ -116,7 +119,7 @@ export class InNhanVienModal extends Component {
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="contained-modal-title-vcenter">
-                            Biểu mẫu hồ sơ nhân viên
+                            Biểu mẫu quyết định khen thưởng
                             <Button>
                                 <PrintIcon color="inherit"
                                     onClick={this.printDocument}
@@ -130,33 +133,36 @@ export class InNhanVienModal extends Component {
                             <div id="divToPrint" className="page1">
                                 <h5 className="tieude">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h5>
                                 <p className="tieude">Độc lập – Tự do – Hạnh phúc</p>
-                                <h4 className="tenbieumau">HỒ SƠ NHÂN VIÊN </h4>
-                                <p className="noidung">1. Họ và tên:  {this.props.nvho} {this.props.nvten} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                 Giới tính: {this.props.nvgioitinh}</p>
-                                <p className="noidung">2. Họ và tên thường dùng:  {this.props.nvho} {this.props.nvten}</p>
-                                <p className="noidung">3. Sinh ngày:  {this.props.nvngaysinh} </p>
-                                <p className="noidung">4. Nơi sinh:  {this.props.nvnoisinh} </p>
-                                <p className="noidung">5. Nguyên quán: {this.props.nvdcthuongtru}</p>
-                                <p className="noidung">6. Nơi đăng ký hộ khẩu thường trú:  {this.props.nvdcthuongtru} </p>
-                                <p className="noidung">7. Chỗ ở hiện nay:  {this.props.nvchohientai} </p>
-                                <p className="noidung">8. Điện thoại:  {this.props.nvsdt} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Dân tộc:  {this.layTenDT(this.props.nvdantoc)}&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tôn giáo:  {this.props.nvtongiao}  </p>
-                                <p className="noidung">9. Số chứng minh: {this.props.nvsocmnd} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cấp ngày:  {this.props.nvngaycap}
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nơi cấp:  {this.props.nvnoicap} </p>
-                                {/* <p className="noidung">10. Trình độ giáo dục: </p> */}
-                                <p className="noidung">10. Trình độ chuyên môn cao nhất được đào tạo:  {this.layTenTD(this.props.nvdaotao)} </p>
-                                <p className="noidung">11. Tình trạng hôn nhân:  {this.props.nvtinhtranghonnhan}  </p>
-                                <p className="noidung">Tôi xin cam đoan bản khai sơ yếu lý lịch trên đúng sự thật, nếu có điều gì không đúng tôi chịu trách nhiệm trước pháp luật về lời khai của mình.</p>
-                                <p className="ngay">…………ngày ………tháng ……năm………</p>
-                                <p className="chungnhan">Chứng nhận của cơ quan đang công tác  </p>
-                                <p className="chungnhan">hoặc địa phương nơi đăng ký hộ khẩu <h6 className="nguoikhai">Người khai</h6> </p>
+                                <p className="tenbieumau">-----------------------------</p>
+                                <p className="ngay">TP.Hồ Chí Minh, Ngày.....tháng......năm......</p>
+                                <h5 className="tenbieumau">QUYẾT ĐỊNH KHEN THƯỞNG</h5>
+                                <h5 className="tenbieumau">V/v Khen thưởng nhân sự</h5>
+                                <h5 className="tenbieumau">GIÁM ĐỐC CÔNG TY CỔ PHẦN ABC</h5>
+
+                                <p className="noidung">Điều 1. Nay khen thưởng  Ông (Bà) : {this.props.qdhodem}&nbsp;{this.props.qdtennv}  </p>
+                                <p className="noidung"> Điều 2. Các chế độ của ông/bà {this.props.qdhodem}&nbsp;{this.props.qdtennv}  gồm: thưởng  {this.props.qdtienthuong} VND. </p>
+                                <p className="noidung">&nbsp;&nbsp;&nbsp;-  Lý do: {this.props.qdnoidung}</p>
+                                <p className="noidung">Điều 3. Các ông Chánh Văn Phòng (Trưởng phòng hành chính), Trưởng phòng tổ chức cán bộ và Ông (Bà) {this.props.qdhodem}&nbsp;{this.props.qdtennv} chịu trách nhiệm thi hành quyết định này.</p>
+                                <p className="ft1">GIÁM ĐỐC</p>
+                                <p className="noinhan">Nơi nhận &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                (Ký, ghi rõ họ tên)</p>
+                                <p className="noinhan"> - Như điều 3</p>
+                                <p className="noinhan">- Lưu VP</p>
+
                             </div>
                         </div>
                     </Modal.Body>
-                    <Modal.Footer>
+                    {/* <Modal.Footer>
                         <Button
                             className="mr-3"
                             variant="contained"
@@ -164,7 +170,7 @@ export class InNhanVienModal extends Component {
                             startIcon={<CancelIcon />}
                             onClick={this.props.onHide}
                         >Đóng</Button>
-                    </Modal.Footer>
+                    </Modal.Footer> */}
                 </Modal>
             </div>
         );

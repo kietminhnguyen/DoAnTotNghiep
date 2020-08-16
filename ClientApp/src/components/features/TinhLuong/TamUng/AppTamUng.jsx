@@ -164,9 +164,10 @@ export class AppTamUng extends Component {
         return nhanviens.map(nv => {
             return hds.map(hd => {
                 if (nv.idnhanVien == hd.idnhanVien
-                    && nv.trangthaiHdchinhThuc != null //kt có phải là nv chính thức
+                    && nv.trangthaiHdchinhThuc == 'Đã ký' //kt có phải là nv chính thức
                     && differenceInDays(new Date(hd.ngayHetHan), new Date(DMY)) > 30 //kt hd chính thức còn hạn
                     && (nv.idphongBan == this.state.idphongBan || this.state.idphongBan == "")
+                    && nv.username != "adminNS" && nv.username != "adminTC"
                 ) {
                     return (
                         <StyledTableRow>

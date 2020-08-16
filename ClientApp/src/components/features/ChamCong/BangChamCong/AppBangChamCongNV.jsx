@@ -2,16 +2,8 @@ import React, { Component } from 'react';
 import { Form, Row, Col } from 'react-bootstrap'
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, ButtonGroup, Button, Select, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import EditIcon from "@material-ui/icons/Edit"
-import DeleteIcon from "@material-ui/icons/Delete"
 
-import { format, differenceInDays, getDate } from 'date-fns'
-
-//import { AddChamCongThuCong } from '../ChamCongThuCong/AddChamCongThuCong';
-import { EditBangChamCong } from '../BangChamCong/EditBangChamCong';
-
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
+import { format } from 'date-fns'
 
 
 const StyledTableCell = withStyles((theme) => ({
@@ -39,12 +31,13 @@ const StyledTable = withStyles((theme) => ({
     },
 }))(Table);
 
-export class AppBangChamCong extends Component {
+export class AppBangChamCongNV extends Component {
     //static displayName = AppBangChamCong.name;
 
     constructor(props) {
         super(props);
         this.state = {
+            tkToken: [],
             nhanviens: [],
             chamcongs: [],
             pbs: [],
@@ -59,10 +52,6 @@ export class AppBangChamCong extends Component {
         this.handleChange = this.handleChange.bind(this)
     }
 
-    SnackbarClose = (event) => {
-        this.setState({ snackbaropen: false });
-    }
-
     componentDidMount() {
         this.loadChamCong()
         this.loadNV()
@@ -72,6 +61,15 @@ export class AppBangChamCong extends Component {
     // componentDidUpdate() {
     //     this.loadChamCong()
     // }
+
+    componentWillMount() {
+        if (localStorage && localStorage.getItem('token')) {
+            var tkToken = JSON.parse(localStorage.getItem('token'))
+            this.setState({
+                tkToken: tkToken
+            })
+        }
+    }
 
     loadChamCong() {
         fetch('https://localhost:44390/api/chamcongs')
@@ -165,14 +163,21 @@ export class AppBangChamCong extends Component {
         </Select>
     }
 
+    checkToken(idnv) { // kiểm tra tk đăng nhập vào có trùng với idCC. Nếu trùng sẽ show thông tin về ... của nv đó
+        let check = false;
+        for (let j = 0; j < this.state.tkToken.length; j++) {
+            if (this.state.tkToken[j].username == idnv) {
+                return check = true
+            }
+        }
+        return check = false
+    }
+
     showTableData() {
-        const { nhanviens, chamcongs, idchamcong, ccghichu, ccngay, ccgiovao, ccgiora, ccidnv } = this.state;
-        let editModalClose = () => this.setState({ editModalShow: false })
-
-
+        const { nhanviens, chamcongs } = this.state;
         return chamcongs.map(cc => {
             return nhanviens.map(nv => {
-                if (cc.idnhanVien == nv.idnhanVien // tra cứu bằng tk không phải là tk nv
+                if (cc.idnhanVien == nv.idnhanVien && this.checkToken(nv.idnhanVien) // tra cứu bằng tk nv
                     && ((cc.ngayChamCong.substring(0, 10) == this.state.ngayChamCong)
                         && (nv.idphongBan == this.state.idphongBan || this.state.idphongBan == ''))
                 ) {
@@ -186,40 +191,7 @@ export class AppBangChamCong extends Component {
                             <StyledTableCell align="center">{cc.gioVao.substring(0, 5)}</StyledTableCell>
                             <StyledTableCell align="center">{cc.gioRa.substring(0, 5)}</StyledTableCell>
                             <StyledTableCell align="center">{cc.soGioLam}</StyledTableCell>
-                            <StyledTableCell align="right">
-                                <ButtonGroup variant="text">
 
-                                    <Button>
-                                        <EditIcon color="primary"
-                                            onClick={() => this.setState({
-                                                editModalShow: true,
-                                                idchamcong: cc.idchamCong,
-                                                ccngay: cc.ngayChamCong.substring(0, 10),
-                                                ccghichu: cc.ghiChu,
-                                                ccgiovao: cc.gioVao,
-                                                ccgiora: cc.gioRa,
-                                                ccidnv: cc.idnhanVien,
-                                            })}>
-                                        </EditIcon>
-                                    </Button>
-                                    <Button>
-                                        <DeleteIcon color="secondary"
-                                            onClick={() => this.deleteChamCong(cc.idchamCong)}>
-                                        </DeleteIcon>
-                                    </Button>
-
-                                    <EditBangChamCong
-                                        show={this.state.editModalShow}
-                                        onHide={editModalClose}
-                                        idchamcong={idchamcong}
-                                        ccngay={ccngay}
-                                        ccghichu={ccghichu}
-                                        ccgiovao={ccgiovao}
-                                        ccgiora={ccgiora}
-                                        ccidnv={ccidnv}
-                                    />
-                                </ButtonGroup>
-                            </StyledTableCell>
                         </StyledTableRow>)
                 }
 
@@ -271,7 +243,7 @@ export class AppBangChamCong extends Component {
                                 <StyledTableCell align="center">Giờ vào</StyledTableCell>
                                 <StyledTableCell align="center">Giờ ra</StyledTableCell>
                                 <StyledTableCell align="center">Số giờ làm</StyledTableCell>
-                                <StyledTableCell align="center">Chức năng</StyledTableCell>
+                                {/* <StyledTableCell align="center">Chức năng</StyledTableCell> */}
 
                             </StyledTableRow>
                         </TableHead>

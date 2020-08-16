@@ -31,6 +31,7 @@ export class EditChucVuModal extends Component {
             body: JSON.stringify({
                 idchucVu: parseInt(event.target.chucvuID.value),
                 tenChucVu: event.target.chucvuTEN.value,
+                heSoChucVu: event.target.chucvuHESO.value,
                 moTa: event.target.chucvuMOTA.value
             })
         })
@@ -93,6 +94,16 @@ export class EditChucVuModal extends Component {
                                             name="chucvuTEN"
                                             required
                                             defaultValue={this.props.cvten}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group controlId="chucvuHESO">
+                                        <Form.Label>Hệ số chức vụ</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="chucvuHESO"
+                                            required
+                                            defaultValue={this.props.cvheso}
                                         />
                                     </Form.Group>
 

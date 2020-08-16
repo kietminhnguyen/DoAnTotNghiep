@@ -1,0 +1,46 @@
+.tieude{
+ text-align: center;
+ line-height: 3;
+}
+.dinhdang{
+    margin-left: 10rem;
+    margin-top: 5rem;
+}
+.tenbieumau{
+    text-align: center;
+    font-weight: 600;
+}
+.noidung{
+    margin-left: 5rem;
+    margin-right: 2em;
+    line-height: 2;
+}
+.ngay{
+    margin-left: 27em;
+
+}
+.chungnhan{
+    margin-left: 8em;
+}
+.nguoikhai{
+    margin-left: 25em;
+}
+.page1{
+    padding-top: 5em;
+    margin-top: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+.noidung1{
+    margin-left: 7em;
+    margin-right:2em;
+    line-height: 2;
+}
+.ft1{
+    margin-left: 40em;
+    line-height: 2;
+}
+.noinhan{
+    margin-left: 7em;
+    line-height: 2;
+}

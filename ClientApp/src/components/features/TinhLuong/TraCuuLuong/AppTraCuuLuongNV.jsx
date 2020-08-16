@@ -49,11 +49,12 @@ const StyledTableCellHead = withStyles((theme) => ({
 }))(TableCell);
 
 
-export class AppTraCuuLuong extends Component {
+export class AppTraCuuLuongNV extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            tkToken: [],
             pbs: [],
             nhanviens: [],
             bangluongs: [],
@@ -74,6 +75,15 @@ export class AppTraCuuLuong extends Component {
         this.loadNV()
         this.loadBangLuong()
         this.loadPB()
+    }
+
+    componentWillMount() {
+        if (localStorage && localStorage.getItem('token')) {
+            var tkToken = JSON.parse(localStorage.getItem('token'))
+            this.setState({
+                tkToken: tkToken
+            })
+        }
     }
 
     loadNV() {
@@ -140,6 +150,16 @@ export class AppTraCuuLuong extends Component {
         </Select>
     }
 
+    checkToken(idnv) { // kiểm tra tk đăng nhập vào có trùng với idCC. Nếu trùng sẽ show thông tin về ... của nv đó
+        let check = false;
+        for (let j = 0; j < this.state.tkToken.length; j++) {
+            if (this.state.tkToken[j].username == idnv) {
+                return check = true
+            }
+        }
+        return check = false
+    }
+
     getTableData() {
 
         const { bangluongs, nhanviens,
@@ -168,7 +188,7 @@ export class AppTraCuuLuong extends Component {
         if (flag) {
             return bangluongs.map(bl => {
                 return nhanviens.map(nv => {
-                    if (bl.idnhanVien == nv.idnhanVien
+                    if (bl.idnhanVien == nv.idnhanVien && this.checkToken(bl.idnhanVien)
                         //&& ( parseInt(this.state.ThangNamChamCong.substring(6,7)) == bl.thang )
                         //&& ( parseInt(this.state.ThangNamChamCong.substring(0,4)) == bl.nam )
                         && (layThangDaChon == bl.thang)

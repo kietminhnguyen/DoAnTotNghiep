@@ -188,7 +188,7 @@ export class AppDoDuLieu extends Component {
         //event.preventDefault();
         var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
         var layNamDaChon = getYear(new Date(this.state.ThangNamChamCong))
-        
+
         //////////////////////// lấy data của bảng chấm công để post ///////////////////
         var newArrayChamCong = []
         //////check nv còn hợp đồng
@@ -230,16 +230,16 @@ export class AppDoDuLieu extends Component {
                 mucLuong: 6000000,
                 tienThuong: 0,
                 tienPhatDiTre: 0,
-                tongThuNhap:0,
+                tongThuNhap: 0,
                 tienPhat: 0,
-                tongGioTangCa:0,
-                tienTangCa:0,
+                tongGioTangCa: 0,
+                tienTangCa: 0,
                 tienTamUng: 0,
                 phuCapKhac: 0,
                 truBh: 0,
                 soNgayCong: 0,
-                soNgayDiTre:0,
-                soNgayDiTreKhongTinhLuong:0,
+                soNgayDiTre: 0,
+                soNgayDiTreKhongTinhLuong: 0,
                 soNgayNghi: 0,
                 tienThucLinh: 0,
                 ghiChu: '0',
@@ -428,89 +428,46 @@ export class AppDoDuLieu extends Component {
         }
     }
 
-    checkShow3Button() {
-        var flag = false
-        var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
-        var layNamDaChon = getYear(new Date(this.state.ThangNamChamCong))
-        for (let i = 0; i < this.state.bangluongs.length; i++) {
-            if (
-                layThangDaChon == parseInt(this.state.bangluongs[i].thang)
-                && layNamDaChon == parseInt(this.state.bangluongs[i].nam)
-                && this.state.bangluongs[i].ghiChu == null
-            ) {
-                //flag = true
-                return (
-                    <Row>
-                        <Button className={'ml-4'}
-                            variant="contained"
-                            color="primary"
-                            startIcon={<ArchiveIcon />}
-                            onClick={() => this.handleSubmitDoTamUng()}
-                        >Đỗ dữ liệu tạm ứng
-                        </Button>
+    // checkShow3Button() {
+    //     var flag = false
+    //     var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
+    //     var layNamDaChon = getYear(new Date(this.state.ThangNamChamCong))
+    //     for (let i = 0; i < this.state.bangluongs.length; i++) {
+    //         if (
+    //             layThangDaChon == parseInt(this.state.bangluongs[i].thang)
+    //             && layNamDaChon == parseInt(this.state.bangluongs[i].nam)
+    //             && this.state.bangluongs[i].ghiChu == null
+    //         ) {
+    //             //flag = true
+    //             return (
+    //                 <Row>
+    //                     <Button className={'ml-4'}
+    //                         variant="contained"
+    //                         color="primary"
+    //                         startIcon={<ArchiveIcon />}
+    //                         onClick={() => this.handleSubmitDoTamUng()}
+    //                     >Đỗ dữ liệu tạm ứng
+    //                     </Button>
 
-                        <Button className={'ml-4'}
-                            variant="contained"
-                            color="primary"
-                            startIcon={<ArchiveIcon />}
-                        //onClick={() => this.handleSubmitDoTamUng()}
-                        >Đỗ dữ liệu khen thưởng
-                        </Button>
+    //                     <Button className={'ml-4'}
+    //                         variant="contained"
+    //                         color="primary"
+    //                         startIcon={<ArchiveIcon />}
+    //                     //onClick={() => this.handleSubmitDoTamUng()}
+    //                     >Đỗ dữ liệu khen thưởng
+    //                     </Button>
 
-                        <Button className={"ml-4"}
-                            variant="contained"
-                            color="primary"
-                            startIcon={<ArchiveIcon />}
-                        //onClick={() => this.handleSubmitDoTamUng()}
-                        >Đỗ dữ liệu kỷ luật
-                        </Button>
-                    </Row>)
-            }
-            // else {
-            //     if (
-            //         layThangDaChon == parseInt(this.state.bangluongs[i].thang)
-            //         && layNamDaChon == parseInt(this.state.bangluongs[i].nam)
-            //         && this.state.bangluongs[i].ghiChu == "Đã đỗ"
-            //     ) {
-            //         return (
-            //             <Row>
-            //                 <Button className={'ml-4'}
-            //                     variant="contained"
-            //                     color="inherit"
-            //                     startIcon={<ArchiveIcon />}
-            //                     onClick={() => this.handleSubmitDoTamUng()}
-            //                 >Đỗ dữ liệu tạm ứng
-            //             </Button>
-
-            //                 <Button className={'ml-4'}
-            //                     variant="contained"
-            //                     color="inherit"
-            //                     startIcon={<ArchiveIcon />}
-            //                 //onClick={() => this.handleSubmitDoTamUng()}
-            //                 >Đỗ dữ liệu khen thưởng
-            //             </Button>
-
-            //                 <Button className={"ml-4"}
-            //                     variant="contained"
-            //                     color="inherit"
-            //                     startIcon={<ArchiveIcon />}
-            //                 //onClick={() => this.handleSubmitDoTamUng()}
-            //                 >Đỗ dữ liệu kỷ luật
-            //             </Button>
-            //             </Row>)
-            //     }
-            // }
-        }
-
-
-
-        if (flag) {
-
-        }
-        else {
-
-        }
-    }
+    //                     <Button className={"ml-4"}
+    //                         variant="contained"
+    //                         color="primary"
+    //                         startIcon={<ArchiveIcon />}
+    //                     //onClick={() => this.handleSubmitDoTamUng()}
+    //                     >Đỗ dữ liệu kỷ luật
+    //                     </Button>
+    //                 </Row>)
+    //         }
+    //     }
+    // }
 
     showTableData() {
         var flag = false
@@ -532,26 +489,6 @@ export class AppDoDuLieu extends Component {
                 <h2 className="display-7">Không có dữ liệu</h2>
             )
         }
-
-        // const { nhanviens, chamcongs} = this.state;
-        // return chamcongs.map((cc, key1) => {
-        //     return nhanviens.map(nv => {
-        //         if (cc.idnhanVien == nv.idnhanVien
-        //             && (cc.ngayChamCong.substring(0, 7) == this.state.ThangNamChamCong)) {
-        //             return (
-        //                 <StyledTableRow key={cc.idchamCong}>
-        //                     <StyledTableCell>{key1 + 1}</StyledTableCell>
-        //                     <StyledTableCell>{this.layTenNV(cc.idnhanVien)}</StyledTableCell>
-        //                     <StyledTableCell>{cc.idnhanVien}</StyledTableCell>
-        //                     <StyledTableCell>{this.layTenPB(nv.idphongBan)}</StyledTableCell>
-        //                     <StyledTableCell>{format(new Date(cc.ngayChamCong), 'dd-MM-yyyy')}</StyledTableCell>
-        //                     <StyledTableCell>{cc.gioVao.substring(0, 5)}</StyledTableCell>
-        //                     <StyledTableCell>{cc.gioRa.substring(0, 5)}</StyledTableCell>
-        //                     <StyledTableCell>{cc.soGioLam}</StyledTableCell>
-        //                 </StyledTableRow>)
-        //         }
-        //     })
-        // })
     }
 
 
@@ -586,27 +523,6 @@ export class AppDoDuLieu extends Component {
                 <div className="container text-center">
                     {this.showTableData()}
                 </div>
-
-                {/* <TableContainer>
-                    <StyledTable className="mt-3">
-                        <TableHead>
-                            <StyledTableRow>
-                                <StyledTableCell>#</StyledTableCell>
-                                <StyledTableCell>Tên Nhân Viên</StyledTableCell>
-                                <StyledTableCell>ID Nhân Viên</StyledTableCell>
-                                <StyledTableCell>Thuộc phòng ban</StyledTableCell>
-                                <StyledTableCell>Ngày Chấm Công</StyledTableCell>
-                                <StyledTableCell>Giờ Vào</StyledTableCell>
-                                <StyledTableCell>Giờ Ra</StyledTableCell>
-                                <StyledTableCell>Số Giờ Làm</StyledTableCell>
-                            </StyledTableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.showTableData()}
-                        </TableBody>
-                    </StyledTable>
-                </TableContainer> */}
-
             </div >
         )
     }

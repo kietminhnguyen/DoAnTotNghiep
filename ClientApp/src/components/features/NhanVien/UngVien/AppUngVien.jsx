@@ -480,7 +480,7 @@ export class AppUngVien extends Component {
                             </StyledTableRow>)
 
                     }
-                    else {  
+                    else {  /////
 
                         if (uv.idungVien == bn.idungVien
                             && uv.noiDaoTao == this.state.chon

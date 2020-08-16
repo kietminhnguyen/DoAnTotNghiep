@@ -130,12 +130,14 @@ export class AppHDChinhThuc extends Component {
                             //nvnganhhoc: nv.nganhHoc,
                             nvnoidaotao: nv.noiDaoTao,
                             //nvxeploai: nv.xepLoai,
+                            nvusername: nv.username,
                             nvdantoc: nv.iddanToc,
                             nvdaotao: nv.idtrinhDo,
                             nvquoctich: nv.quocTich,
                             nvcv: nv.idchucVu,
                             nvchinhthuc: nv.trangthaiHdchinhThuc,
-                            nvhinh: nv.hinhAnh
+                            nvhinh: nv.hinhAnh,
+                            nvqdbn: nv.idquyetDinhBn
                         })}
                     >Ký hợp đồng
                     </Button>)
@@ -149,10 +151,11 @@ export class AppHDChinhThuc extends Component {
         const { nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail, nvhinh,
             nvchinhthuc, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
             nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich,
-            nvnoidaotao, nvdantoc, nvdaotao } = this.state
+            nvnoidaotao, nvdantoc, nvdaotao, nvusername ,nvqdbn } = this.state
         return nhanviens.map(nv => {
             if (nv.noiDaoTao != "Bổ nhiệm"
                 && nv.idphongBan == this.state.chonPB
+                && nv.username != "adminNS" && nv.username != "adminTC"
                 //|| this.state.chonPB == '')
             ) {
                 return (
@@ -191,12 +194,14 @@ export class AppHDChinhThuc extends Component {
                                         //nvnganhhoc: nv.nganhHoc,
                                         nvnoidaotao: nv.noiDaoTao,
                                         //nvxeploai: nv.xepLoai,
+                                        nvusername: nv.username,
                                         nvdantoc: nv.iddanToc,
                                         nvdaotao: nv.idtrinhDo,
                                         nvquoctich: nv.quocTich,
                                         nvcv: nv.idchucVu,
                                         nvchinhthuc: nv.trangthaiHdchinhThuc,
-                                        nvhinh: nv.hinhAnh
+                                        nvhinh: nv.hinhAnh,
+                                        nvqdbn: nv.idquyetDinhBn
                                     })}>
                                 </VisibilityIcon>
                             </Button>
@@ -223,6 +228,7 @@ export class AppHDChinhThuc extends Component {
                                 //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
                                 //nvxeploai={nvxeploai}
+                                nvusername={nvusername}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
@@ -230,6 +236,7 @@ export class AppHDChinhThuc extends Component {
                                 nvcv={nvcv}
                                 nvchinhthuc={nvchinhthuc}
                                 nvpic={nvhinh}
+                                nvqdbn={nvqdbn}
                             />
 
                             <ShowHDChinhThucModal
@@ -254,6 +261,7 @@ export class AppHDChinhThuc extends Component {
                                 //nvnganhhoc={nvnganhhoc}
                                 nvnoidaotao={nvnoidaotao}
                                 //nvxeploai={nvxeploai}
+                                //nvusername={nvusername}
                                 nvdantoc={nvdantoc}
                                 nvdaotao={nvdaotao}
                                 nvngaysinh={nvngaysinh}
@@ -261,6 +269,7 @@ export class AppHDChinhThuc extends Component {
                                 nvcv={nvcv}
                                 nvchinhthuc={nvchinhthuc}
                                 nvpic={nvhinh}
+                                // nvqdbn={nvqdbn}
                             />
                         </StyledTableCell>
                     </StyledTableRow>)

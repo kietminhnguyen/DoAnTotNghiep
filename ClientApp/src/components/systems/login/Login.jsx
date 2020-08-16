@@ -33,13 +33,14 @@ export class Login extends Component {
         this.onLogin = this.onLogin.bind(this);
     }
 
-    onChange(e) {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
+    componentDidMount() {
+        this.loadTK()
+    }
+    componentDidUpdate() {
+        this.loadTK()
     }
 
-    componentDidMount() {
+    loadTK() {
         fetch('https://localhost:44390/api/taikhoans')
             .then(response => response.json())
             .then(data => {
@@ -47,21 +48,44 @@ export class Login extends Component {
             });
     }
 
+    onChange(event) {
+        // this.setState({
+        //     [e.target.name]: e.target.value
+        // })
+        var target = event.target
+        var name = target.name
+        var value = target.value
+        this.setState({
+            [name]: value
+        })
+    }
+
     onLogin() {
         const { username, password } = this.state;
-            if(this.state.isLogin == false){
-                alert('Tài khoản hoặc Mật khẩu không chính xác')
+        let flag = false
+        let mangTam = []
+        for (let i = 0; i < this.state.taikhoans.length; i++) {
+            if (username === this.state.taikhoans[i].username && password === this.state.taikhoans[i].password) {
+                mangTam.push({
+                    username: this.state.taikhoans[i].username,
+                    password: this.state.taikhoans[i].password,
+                    mail: this.state.taikhoans[i].mail
+                })
+                flag = true
+                //alert('ok')
+                //alert('Tài khoản hoặc Mật khẩu không chính xác')
             }
-            for (let i = 0; i < this.state.taikhoans.length; i++) {
-                if (username === this.state.taikhoans[i].username && password === this.state.taikhoans[i].password) {
-                    localStorage.setItem("token", this.createToken());
-                    this.setState({
-                        isLogin: true
-                    });
-                    //alert('ok')
-                    //alert('Tài khoản hoặc Mật khẩu không chính xác')
-                }
-            }
+        }
+        if (flag) {
+            localStorage.setItem("token", JSON.stringify(mangTam));
+            this.setState({
+                isLogin: true
+            });
+        }
+        else {
+            alert('Tài khoản hoặc Mật khẩu không chính xác')
+        }
+        //console.log(mangTam)
     }
 
     SignUp = () => {
@@ -137,12 +161,8 @@ export class Login extends Component {
     };
 
     createToken() {
-        return this.rand() + this.rand();
+        //return this.rand() + this.rand();
     };
-
-    // componentDidUpdate() {
-    //     this.refreshLish();
-    // }
 
     render() {
         if (this.state.isLogin) {
@@ -152,16 +172,19 @@ export class Login extends Component {
             <div className="login-wrap">
                 <div className="login-html">
                     <input id="tab-1" type="radio" name="tab" className="sign-in" defaultChecked /><label htmlFor="tab-1" className="tab">Đăng nhập</label>
-                    <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab">Đăng ký</label>
+                    <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab"></label>
                     <div className="login-form">
+
                         <div className="sign-in-htm">
                             <div className="group">
                                 <label htmlFor="user" className="label">Tài khoản</label>
-                                <input name="username" type="text" className="input" value={this.state.username} onChange={this.onChange} />
+                                <input name="username" type="text" className="input"
+                                    value={this.state.username} onChange={this.onChange} />
                             </div>
                             <div className="group">
                                 <label htmlFor="pass" className="label">Mật khẩu</label>
-                                <input name="password" type="password" className="input" data-type="password" value={this.state.password} onChange={this.onChange} />
+                                <input name="password" type="password" className="input" data-type="password"
+                                    value={this.state.password} onChange={this.onChange} />
                             </div>
                             {/* <div className="group">
                                 <input id="check" type="checkbox" className="check" defaultChecked />
@@ -175,8 +198,10 @@ export class Login extends Component {
                                 <a href="#forgot">Forgot Password?</a>
                             </div> */}
                         </div>
+                        
+                        {/*                         
                         <div className="sign-up-htm">
-                            {/* <div className="group">
+                            <div className="group">
                                 <label htmlFor="user" className="label">Username</label>
                                 <input name="signupname" id="user" type="text" className="input" value={this.state.signupname} onChange={this.onChange} />
                             </div>
@@ -191,11 +216,11 @@ export class Login extends Component {
                             <div className="group">
                                 <label htmlFor="pass" className="label">Email Address</label>
                                 <input name="signupmail" id="pass" type="text" className="input" value={this.state.signupmail} onChange={this.onChange} />
-                            </div> */}
-                            {/* <div className="group" onSubmit={this.handleSubmit}> */}
-                            {/* <input type="submit" className="button" defaultValue="Sign Up" onClick={this.SignUp} /> */}
-                            {/* <input type="submit" className="button" defaultValue="Sign Up"/> */}
-                            {/* </div> */}
+                            </div>
+                            <div className="group" onSubmit={this.handleSubmit}>
+                            <input type="submit" className="button" defaultValue="Sign Up" onClick={this.SignUp} />
+                            <input type="submit" className="button" defaultValue="Sign Up"/>
+                            </div>
                             <Form onSubmit={this.handleSubmit}>
                                 <Form.Group controlId="TKusername">
                                     <Form.Label>Tài khoản</Form.Label>
@@ -232,6 +257,7 @@ export class Login extends Component {
                                 <label htmlFor="tab-1">Đã có tài khoản</label>
                             </div>
                         </div>
+                    */}
                     </div>
                 </div>
             </div>

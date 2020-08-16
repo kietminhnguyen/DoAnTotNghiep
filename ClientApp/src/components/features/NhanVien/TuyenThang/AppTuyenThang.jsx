@@ -40,7 +40,7 @@ export class AppTuyenThang extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hopdongs:[],
+            hopdongs: [],
             pbs: [],
             nhanviens: [],
             chonPB: '',
@@ -58,10 +58,10 @@ export class AppTuyenThang extends Component {
         this.loadHD()
     }
 
-    componentDidUpdate() {
-        this.loadNV()
-        //this.loadPB()
-    }
+    // componentDidUpdate() {
+    //     this.loadNV()
+    //     //this.loadPB()
+    // }
 
     loadNV() {
         fetch('https://localhost:44390/api/nhanviens')
@@ -109,15 +109,15 @@ export class AppTuyenThang extends Component {
     }
 
     getTableData() {
-        const { hopdongs,nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, 
-            nvmail, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru, 
+        const { hopdongs, nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt,
+            nvmail, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
             nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvhinh,
             nvnganhhoc, nvnoidaotao, nvxeploai, nvdantoc, nvdaotao } = this.state
 
         let showModalClose = () => this.setState({ showModalShow: false })
 
         return nhanviens.map(nv => {
-            return hopdongs.map(hd =>{
+            return hopdongs.map(hd => {
                 if (nv.idphongBan == this.state.chonPB
                     //|| this.state.chonPB == ''
                     && nv.idnhanVien == hd.idnhanVien
@@ -164,7 +164,7 @@ export class AppTuyenThang extends Component {
                                     })}>
                                 </VisibilityIcon>
                             </Button>
-    
+
                             <ShowTuyenThangModal
                                 show={this.state.showModalShow}
                                 onHide={showModalClose}
@@ -207,7 +207,9 @@ export class AppTuyenThang extends Component {
         return (
             <div>
                 <div className="container text-center">
-                    <h1 className="display-7">DANH SÁCH NHÂN VIÊN</h1><hr />
+                    <h2 className="display-7">DANH SÁCH NHÂN VIÊN ĐÃ KÝ HỢP ĐỒNG</h2>
+                    {/* <h5 className="display-7">(Hạn hợp đồng còn hơn 30 ngày)</h5> */}
+                    <hr /><hr />
                 </div>
 
 
@@ -219,12 +221,12 @@ export class AppTuyenThang extends Component {
                         </Col>
                         <Col sm={4}>
                             {/* <label htmlFor="contained-button-file"> */}
-                                <Button variant="contained"
-                                    color="primary"
-                                    component="span"
-                                    startIcon={<PersonAddIcon />}
-                                    onClick={() => this.setState({ addModalShow: true })}>
-                                    Tuyển thêm nhân viên
+                            <Button variant="contained"
+                                color="primary"
+                                component="span"
+                                startIcon={<PersonAddIcon />}
+                                onClick={() => this.setState({ addModalShow: true })}>
+                                Tuyển thêm nhân viên
                                 </Button>
                             {/* </label> */}
                             <AddTuyenThangModal

@@ -9,6 +9,8 @@ import { Home } from '../features/Home';
 import { AppPhongBan } from '../features/danhmuc/PhongBan/AppPhongBan'
 import { AppChucVu } from '../features/danhmuc/chucvu/AppChucVu'
 import { AppNguoiDung } from '../features/danhmuc/NguoiDung/AppNguoiDung'
+import { AppQLNguoiDung } from '../features/danhmuc/QLNguoiDung/AppQLNguoiDung'
+import { AppPhanQuyen } from '../features/danhmuc/PhanQuyen/AppPhanQuyen'
 
 import { AppTuyenThang } from '../features/NhanVien/TuyenThang/AppTuyenThang'
 import { AppNhanVien } from '../features/NhanVien/NV/AppNhanVien'
@@ -27,7 +29,7 @@ import { AppQuyetDinhKiLuat } from '../features/QuyetDinh/KiLuat/AppQuyetDinhKiL
 import { AppQuyetDinhKhenThuong } from '../features/QuyetDinh/KhenThuong/AppQuyetDinhKhenThuong'
 import { AppXemQDBN } from '../features/QuyetDinh/XemQDBN/AppXemQDBN'
 
-
+import { AppBangChamCongNV } from '../features/ChamCong/BangChamCong/AppBangChamCongNV'
 import { AppBangChamCong } from '../features/ChamCong/BangChamCong/AppBangChamCong'
 import { AppChamCongMaVach } from '../features/ChamCong/ChamCongMaVach/AppChamCongMaVach'
 import { AppChamCongThuCong } from '../features/ChamCong/ChamCongThuCong/AppChamCongThuCong'
@@ -35,7 +37,9 @@ import { AppDoDuLieu } from '../features/ChamCong/DoDuLieu/AppDoDuLieu'
 
 import { AppTamUng } from '../features/TinhLuong/TamUng/AppTamUng'
 import { AppLuongThang } from '../features/TinhLuong/LuongThang/AppLuongThang'
+import { AppTraCuuLuongNV } from '../features/TinhLuong/TraCuuLuong/AppTraCuuLuongNV'
 import { AppTraCuuLuong } from '../features/TinhLuong/TraCuuLuong/AppTraCuuLuong'
+import { AppTraCuuTamUngNV } from '../features/TinhLuong/TraCuuTamUng/AppTraCuuTamUngNV'
 import { AppTraCuuTamUng } from '../features/TinhLuong/TraCuuTamUng/AppTraCuuTamUng'
 
 export class Layout extends Component {
@@ -66,6 +70,8 @@ export class Layout extends Component {
           < Route path='/phongban' component={AppPhongBan} />
           < Route path='/chucvu' component={AppChucVu} />
           < Route path='/nguoidung' component={AppNguoiDung} />
+          < Route path='/quanlynguoidung' component={AppQLNguoiDung} />
+          < Route path='/phanquyen' component={AppPhanQuyen} />
 
           < Route path='/nhanvien' component={AppNhanVien} />
           < Route path='/tuyenthang' component={AppTuyenThang} />
@@ -83,18 +89,20 @@ export class Layout extends Component {
           < Route path='/quyetdinhkiluat' component={AppQuyetDinhKiLuat} />
           < Route path='/quyetdinhkhenthuong' component={AppQuyetDinhKhenThuong} />
           < Route path='/xemqdbn' component={AppXemQDBN} />
-          
 
+          < Route path='/bangchamcongNV' component={AppBangChamCongNV} />
           < Route path='/bangchamcong' component={AppBangChamCong} />
           < Route path='/chamcongmavach' component={AppChamCongMaVach} />
           < Route path='/chamcongbosung' component={AppChamCongThuCong} />
           < Route path='/dodulieu' component={AppDoDuLieu} />
-          
+
           < Route path='/tamungluong' component={AppTamUng} />
           < Route path='/luongthang' component={AppLuongThang} />
+          < Route path='/tracuuluongNV' component={AppTraCuuLuongNV} />
           < Route path='/tracuuluong' component={AppTraCuuLuong} />
+          < Route path='/tracuutamungNV' component={AppTraCuuTamUngNV} />
           < Route path='/tracuutamung' component={AppTraCuuTamUng} />
-          
+
         </NavMenu>
 
 

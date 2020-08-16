@@ -30,7 +30,7 @@ export class AddPhongbanModal extends Component {
             body: JSON.stringify({
                 //id : null,
                 tenPhongBan: event.target.PhongbanTEN.value,
-                tenTruongPhong: event.target.PhongbanTRUONG.value,
+                //tenTruongPhong: event.target.PhongbanTRUONG.value,
                 moTa: event.target.PhongbanMOTA.value
             })
         })
@@ -83,7 +83,7 @@ export class AddPhongbanModal extends Component {
                                             placeholder="Tên phòng ban"
                                         />
                                     </Form.Group>
-                                    <Form.Group controlId="PhongbanTRUONG">
+                                    {/* <Form.Group controlId="PhongbanTRUONG">
                                         <Form.Label>Tên trưởng phòng</Form.Label>
                                         <Form.Control
                                             type="text"
@@ -91,7 +91,7 @@ export class AddPhongbanModal extends Component {
                                             required
                                             placeholder="Tên trưởng phòng"
                                         />
-                                    </Form.Group>
+                                    </Form.Group> */}
                                     <Form.Group controlId="PhongbanMOTA">
                                         <Form.Label>Mô tả</Form.Label>
                                         <Form.Control

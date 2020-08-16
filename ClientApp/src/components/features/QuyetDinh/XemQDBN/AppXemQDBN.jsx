@@ -42,7 +42,7 @@ export class AppXemQDBN extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            //bangluongs: [],
+            nhanviens: [],
             ungviens: [],
             qdbns: [],
             ThangNamQuyetDinh: '',
@@ -56,10 +56,18 @@ export class AppXemQDBN extends Component {
     componentDidMount() {
         this.loadQDBN()
         this.loadUV()
-        //this.loadBangLuong()
+        this.loadNV()
     }
     componentDidUpdate() {
         this.loadQDBN()
+    }
+
+    loadNV() {
+        fetch('https://localhost:44390/api/nhanviens')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ nhanviens: data });
+            });
     }
 
     loadUV() {
@@ -70,12 +78,12 @@ export class AppXemQDBN extends Component {
             });
     }
 
-    loadQDBN(){
+    loadQDBN() {
         fetch('https://localhost:44390/api/quyetdinhbonhiems')
-        .then(response => response.json())
-        .then(data => {
-            this.setState({ qdbns: data });
-        });
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ qdbns: data });
+            });
     }
 
     loadBangLuong() {
@@ -85,38 +93,6 @@ export class AppXemQDBN extends Component {
                 this.setState({ bangluongs: data });
             });
 
-    }
-
-    deleteQuyetDinh(idqd) {
-        let flag = false
-        // kiểm tra đã đỗ dữ liệu hay chưa
-        // nếu đỗ rồi sẽ không được xóa qdKT
-        // for (let i = 0; i < this.state.bangluongs.length; i++) {
-        //     for (let j = 0; j < this.state.quyetdinhkts.length; j++) {
-        //         if (this.state.bangluongs[i].thang == this.state.quyetdinhkts[j].ngayHieuLuc.substring(5, 7)
-        //             && this.state.bangluongs[i].nam == this.state.quyetdinhkts[j].ngayHieuLuc.substring(0, 4)
-        //             && this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkts[j].idnhanVien
-        //         ) {
-        //             flag = true
-        //         }
-        //     }
-        // }
-        // if (flag) {
-        //     alert("Đã khóa bảng lương không thể xóa")
-        // }
-        // else {
-            if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
-                axios.delete('https://localhost:44390/api/quyetdinhbonhiems/' + idqd)
-                    .then(response => {
-                        //this.setState({ arrayBL: response.data })
-                        alert("Xóa thành công")
-                    })
-                    .catch(error => {
-                        //this.setState({ showError: "Lỗi post dữ liệu" })
-                        alert("Xóa không thành công")
-                    })
-            }
-        //}
     }
 
     inquyetdinh() {
@@ -149,6 +125,36 @@ export class AppXemQDBN extends Component {
         return idUVofQDBN
     }
 
+    // deleteQuyetDinh(idqd) {
+    //     //let flag = false
+    //     if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
+    //         axios.delete('https://localhost:44390/api/quyetdinhbonhiems/' + idqd)
+    //             .then(response => {
+    //                 //this.setState({ arrayBL: response.data })
+    //                 alert("Xóa thành công")
+    //             })
+    //             .catch(error => {
+    //                 //this.setState({ showError: "Lỗi post dữ liệu" })
+    //                 alert("Xóa không thành công")
+    //             })
+    //     }
+    //     //}
+    // }
+
+    // checkBtnXoaQDBN(idqd) { // kt có tồn tại idquyetDinhBn trong bảng NV hay không. Nếu tồn tại sẽ không show
+    //     for (let i = 0; i < this.state.nhanviens.length; i++) {
+    //         if (idqd == this.state.nhanviens[i].idquyetDinhBn) {
+    //             return (
+    //                 <Button>
+    //                     <DeleteIcon color="secondary"
+    //                         onClick={() => this.deleteQuyetDinh(idqd)}>
+    //                     </DeleteIcon>
+    //                 </Button>
+    //             )
+    //         }
+    //     }
+    // }
+
     getTableData() {
         const { ungviens, qdbns, qdidkt, qdidnv, qdhodem, qdtennv, qdten, qdtienthuong, qdngyathanhlap,
             qdngayhieuluc, qdngayhethieuluc, qdnoidung, qdghichu, nvgioitinh, nvhinh } = this.state;
@@ -156,9 +162,10 @@ export class AppXemQDBN extends Component {
 
         return qdbns.map(qd => {
             return ungviens.map(uv => {
-                if ((qd.ngayHieuLuc.substring(0, 7) == this.state.ThangNamQuyetDinh)
+                if (
+                    (qd.ngayHieuLuc.substring(0, 7) == this.state.ThangNamQuyetDinh)
                     && qd.idungVien == uv.idungVien
-                    //|| this.state.ThangNamQuyetDinh == ''
+                    || (this.state.ThangNamQuyetDinh == '' && qd.idungVien == uv.idungVien)
                 ) {
                     return (
                         <StyledTableRow >
@@ -170,32 +177,9 @@ export class AppXemQDBN extends Component {
                             <StyledTableCell align="center">{qd.ghiChu}</StyledTableCell>
                             <StyledTableCell align="center">
                                 <ButtonGroup variant="text">
-                                    {/* <Button>
-                                        <EditIcon color="primary"
-                                            onClick={() => this.setState({
-                                                editModalShow: true,
-                                                // qdidkt: qd.idquyetDinhKt,
-                                                // qdidnv: qd.idnhanVien,
-                                                // qdhodem: qd.hoDem,
-                                                // qdtennv: qd.ten,
-                                                // qdten: qd.tenQuyetDinh,
-                                                // qdtienthuong: qd.soTienThuong,
-                                                // qdngyathanhlap: qd.ngayLap.substring(0, 10),
-                                                // qdngayhieuluc: qd.ngayHieuLuc.substring(0, 10),
-                                                // qdngayhethieuluc: qd.ngayHetHieuLuc.substring(0, 10),
-                                                // qdnoidung: qd.noiDung,
-                                                // qdghichu: qd.ghiChu,
-                                                // nvgioitinh: nv.gioiTinh,
-                                                // nvhinh: nv.hinhAnh
-                                            })}>
-                                        </EditIcon>
-                                    </Button> */}
 
-                                    <Button>
-                                        <DeleteIcon color="secondary"
-                                            onClick={() => this.deleteQuyetDinh(qd.idquyetDinhBn)}>
-                                        </DeleteIcon>
-                                    </Button>
+                                    {/* {this.checkBtnXoaQDBN(qd.idquyetDinhBn)} */}
+                                    
                                     <Button>
                                         <PrintIcon color="inherit"
                                         //onClick={() => this.inquyetdinh()}
@@ -205,19 +189,19 @@ export class AppXemQDBN extends Component {
                                     <EditQuyetDinhKhenThuong
                                         show={this.state.editModalShow}
                                         onHide={editModalClose}
-                                        // qdidkt={qdidkt}
-                                        // qdidnv={qdidnv}
-                                        // qdhodem={qdhodem}
-                                        // qdtennv={qdtennv}
-                                        // qdten={qdten}
-                                        // qdtienthuong={qdtienthuong}
-                                        // qdngyathanhlap={qdngyathanhlap}
-                                        // qdngayhieuluc={qdngayhieuluc}
-                                        // qdngayhethieuluc={qdngayhethieuluc}
-                                        // qdnoidung={qdnoidung}
-                                        // qdghichu={qdghichu}
-                                        // nvgioitinh={nvgioitinh}
-                                        // nvpic={nvhinh}
+                                    // qdidkt={qdidkt}
+                                    // qdidnv={qdidnv}
+                                    // qdhodem={qdhodem}
+                                    // qdtennv={qdtennv}
+                                    // qdten={qdten}
+                                    // qdtienthuong={qdtienthuong}
+                                    // qdngyathanhlap={qdngyathanhlap}
+                                    // qdngayhieuluc={qdngayhieuluc}
+                                    // qdngayhethieuluc={qdngayhethieuluc}
+                                    // qdnoidung={qdnoidung}
+                                    // qdghichu={qdghichu}
+                                    // nvgioitinh={nvgioitinh}
+                                    // nvpic={nvhinh}
                                     />
                                 </ButtonGroup>
                             </StyledTableCell>

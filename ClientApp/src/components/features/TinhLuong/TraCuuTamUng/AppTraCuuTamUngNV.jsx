@@ -39,11 +39,12 @@ const StyledTable = withStyles((theme) => ({
 }))(Table);
 
 
-export class AppTraCuuTamUng extends Component {
+export class AppTraCuuTamUngNV extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            tkToken:[],
             tamungs: [],
             pbs: [],
             nhanviens: [],
@@ -65,6 +66,15 @@ export class AppTraCuuTamUng extends Component {
         this.loadBangLuong()
         this.loadPB()
         this.loadTamUng()
+    }
+
+    componentWillMount() {
+        if (localStorage && localStorage.getItem('token')) {
+            var tkToken = JSON.parse(localStorage.getItem('token'))
+            this.setState({
+                tkToken: tkToken
+            })
+        }
     }
 
     loadTamUng() {
@@ -139,6 +149,16 @@ export class AppTraCuuTamUng extends Component {
         </Select>
     }
 
+    checkToken(idnv) { // kiểm tra tk đăng nhập vào có trùng với idCC. Nếu trùng sẽ show thông tin về ... của nv đó
+        let check = false;
+        for (let j = 0; j < this.state.tkToken.length; j++) {
+            if (this.state.tkToken[j].username == idnv) {
+                return check = true
+            }
+        }
+        return check = false
+    }
+
     getTableData() {
         const { tamungs, bangluongs, nhanviens } = this.state
         //var layThangDaChon = getMonth(new Date(this.state.ThangNamChamCong)) + 1
@@ -166,7 +186,7 @@ export class AppTraCuuTamUng extends Component {
                 //&& ( parseInt(this.state.ThangNamChamCong.substring(0,4)) == bl.nam )
                 //(layThangDaChon == tu.ngayTamUng.substring(5, 7))
                 //&& (layNamDaChon == tu.ngayTamUng.substring(0, 4))
-                tu.ngayTamUng.substring(0, 10) == this.state.chonNgay
+                tu.ngayTamUng.substring(0, 10) == this.state.chonNgay && this.checkToken(tu.idnhanVien)
             ) {
 
                 return (<StyledTableRow>

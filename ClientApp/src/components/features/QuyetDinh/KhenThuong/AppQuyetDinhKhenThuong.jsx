@@ -10,6 +10,7 @@ import { format, getMonth, getYear } from 'date-fns';
 import axios from 'axios';
 
 import { EditQuyetDinhKhenThuong } from './EditQuyetDinhKhenThuong';
+import { InQuyetDinhKhenThong } from './InQuyetDinhKhenThuong';
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -49,6 +50,7 @@ export class AppQuyetDinhKhenThuong extends Component {
             ThangNamQuyetDinh: '',
             addModalShow: false,
             editModalShow: false,
+            InModalShow: false
             // showModalShow: false
         }
         this.handleChange = this.handleChange.bind(this)
@@ -89,14 +91,22 @@ export class AppQuyetDinhKhenThuong extends Component {
 
     }
 
+    checkDoDuLieu(){
+
+    }
+
     deleteQuyetDinh(idqd) {
+
+        var layThangDaChon = getMonth(new Date(this.state.ThangNamQuyetDinh)) + 1
+        var layNamDaChon = getYear(new Date(this.state.ThangNamQuyetDinh))
+
         let flag = false
         // kiểm tra đã đỗ dữ liệu hay chưa
         // nếu đỗ rồi sẽ không được xóa qdKT
         for (let i = 0; i < this.state.bangluongs.length; i++) {
             for (let j = 0; j < this.state.quyetdinhkts.length; j++) {
-                if (this.state.bangluongs[i].thang == this.state.quyetdinhkts[j].ngayHieuLuc.substring(5, 7)
-                    && this.state.bangluongs[i].nam == this.state.quyetdinhkts[j].ngayHieuLuc.substring(0, 4)
+                if (this.state.bangluongs[i].thang == layThangDaChon
+                    && this.state.bangluongs[i].nam == layNamDaChon
                     && this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkts[j].idnhanVien
                 ) {
                     flag = true
@@ -104,7 +114,7 @@ export class AppQuyetDinhKhenThuong extends Component {
             }
         }
         if (flag) {
-            alert("Đã khóa bảng lương không thể xóa")
+            alert("Đã đỗ dữ liệu của tháng này. Không thể xóa!!!")
         }
         else {
             if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
@@ -155,6 +165,7 @@ export class AppQuyetDinhKhenThuong extends Component {
         const { nhanviens, quyetdinhkts, qdidkt, qdidnv, qdhodem, qdtennv, qdten, qdtienthuong, qdngyathanhlap,
             qdngayhieuluc, qdngayhethieuluc, qdnoidung, qdghichu, nvgioitinh, nvhinh } = this.state;
         let editModalClose = () => this.setState({ editModalShow: false })
+        let InModalClose = () => this.setState({ InModalShow: false })
 
         const formatter = new Intl.NumberFormat('de-DE', {
             style: 'currency',
@@ -206,10 +217,31 @@ export class AppQuyetDinhKhenThuong extends Component {
                                         </DeleteIcon>
                                     </Button>
                                     <Button>
-                                        <PrintIcon color="inherit"
-                                        //onClick={() => this.inquyetdinh()}
-                                        ></PrintIcon>
-                                    </Button>
+                                    <PrintIcon color="inherit"
+                                        onClick={() => this.setState({
+                                            InModalShow: true,
+                                            qdhodem:qd.hoDem, 
+                                            qdtennv:qd.ten, 
+                                            qdtienthuong:qd.soTienThuong,
+                                            qdngyathanhlap:format(new Date(qd.ngayLap), 'dd-MM-yyyy'),
+                                            qdngayhieuluc: format(new Date(qd.ngayHieuLuc), 'dd-MM-yyyy'),
+                                            qdngayhethieuluc:qd.ngayHetHieuLuc,
+                                            qdnoidung:qd.noiDung
+                                        })}>
+                                    </PrintIcon>
+                                </Button>
+
+                                <InQuyetDinhKhenThong
+                                    show={this.state.InModalShow}
+                                    onHide={InModalClose}
+                                    qdhodem={qdhodem}
+                                    qdtennv={qdtennv}
+                                    qdtienthuong={qdtienthuong}
+                                    qdngyathanhlap={qdngyathanhlap}
+                                    qdngayhieuluc={qdngayhieuluc}
+                                    qdngayhethieuluc={qdngayhethieuluc}
+                                    qdnoidung={qdnoidung}
+                                />
 
                                     <EditQuyetDinhKhenThuong
                                         show={this.state.editModalShow}

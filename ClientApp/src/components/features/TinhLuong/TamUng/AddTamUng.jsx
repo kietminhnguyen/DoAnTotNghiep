@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AppCSS from '../../../../AppCSS.css'
-import { format } from 'date-fns';
+import { format, getMonth, getYear, endOfMonth } from 'date-fns';
 
 import axios from 'axios';
 
@@ -45,6 +45,7 @@ export class AddTamUng extends Component {
         super(props);
 
         this.state = {
+            bangluongs:[],
             nhanviens: [],
             tamungluongs: [],
             TamUngNgay: 'yyyy-MM-dd',
@@ -63,6 +64,16 @@ export class AddTamUng extends Component {
     componentDidMount() {
         this.loadTU()
         this.loadNV()
+        this.loadBangLuong()
+    }
+
+    loadBangLuong() {
+        fetch('https://localhost:44390/api/bangluongs')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ bangluongs: data });
+            });
+
     }
 
     loadTU() {
@@ -104,30 +115,57 @@ export class AddTamUng extends Component {
                 tongTien = tongTien + parseInt(this.state.tamungluongs[i].soTienTamUng)
             }
         }
-        console.log("đã ứng: " + tongTien)
-        if (tongTien >= 3000000) { // kt tổng tiền ứng có lớn hơn luongCB/2
-            alert("Tháng này đã tạm ứng vượt 50% lương cơ bản")
+        //console.log("đã ứng: " + tongTien)
+        var layThangTU = getMonth(new Date(event.target.TamUngNgay.value)) + 1
+        var layNamTU = getYear(new Date(event.target.TamUngNgay.value))
+        // console.log(event.target.TamUngNgay.value);
+        // console.log(layThangTU);
+        // console.log(layNamTU);
+
+        let flag = false
+        // kiểm tra đã đỗ dữ liệu hay chưa
+        // nếu đỗ rồi sẽ không được xóa qdKT
+        for (let ii = 0; ii < this.state.bangluongs.length; ii++) {
+            for (let j = 0; j < this.state.tamungluongs.length; j++) {
+                if (this.state.bangluongs[ii].thang == layThangTU
+                    && this.state.bangluongs[ii].nam == layNamTU
+                    //&& this.state.bangluongs[ii].idnhanVien == this.state.tamungluongs[j].idnhanVien
+                ) {
+                    flag = true
+                }
+                else {
+                    flag = false
+                }
+            }
+        }
+        if (flag) {
+            alert("Đã đỗ dữ liệu của tháng này. Không thể tạm ứng nữa!!!")
         }
         else {
-            tongTien = tongTien + parseInt(event.target.TamUngSOTIEN.value)
-            //console.log("thêm: "+tongTien)
-            if (tongTien >= 3000000) {
-                alert("Số tiền ứng đã vượt 50% lương cơ bản. VUI LÒNG NHẬP LẠI!")
-            } else {
-                //console.log("sum= "+tongTien)
-                axios.post('https://localhost:44390/api/tamungluongs', {
-                    ngayTamUng: event.target.TamUngNgay.value,
-                    soTienTamUng: event.target.TamUngSOTIEN.value,
-                    lyDoTamUng: event.target.TamUngLYDO.value,
-                    ghiChu: event.target.TamUngGHICHU.value,
-                    idnhanVien: parseInt(this.props.idnv),
-                })
-                    .then(response => {
-                        //console.log(response)
-                        this.setState({ tamungluongs: response.data })
-                        alert("Tạm ứng thành công")
+            if (tongTien >= 3000000) { // kt tổng tiền ứng có lớn hơn luongCB/2
+                alert("Tháng này đã tạm ứng vượt 50% lương cơ bản")
+            }
+            else {
+                tongTien = tongTien + parseInt(event.target.TamUngSOTIEN.value)
+                //console.log("thêm: "+tongTien)
+                if (tongTien >= 3000000) {
+                    alert("Số tiền ứng đã vượt 50% lương cơ bản. VUI LÒNG NHẬP LẠI!")
+                } else {
+                    //console.log("sum= "+tongTien)
+                    axios.post('https://localhost:44390/api/tamungluongs', {
+                        ngayTamUng: event.target.TamUngNgay.value,
+                        soTienTamUng: event.target.TamUngSOTIEN.value,
+                        lyDoTamUng: event.target.TamUngLYDO.value,
+                        ghiChu: event.target.TamUngGHICHU.value,
+                        idnhanVien: parseInt(this.props.idnv),
                     })
-                ///////////////////////
+                        .then(response => {
+                            //console.log(response)
+                            this.setState({ tamungluongs: response.data })
+                            alert("Tạm ứng thành công")
+                        })
+                    ///////////////////////
+                }
             }
         }
     }

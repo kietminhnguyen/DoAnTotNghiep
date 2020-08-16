@@ -65,10 +65,10 @@ export class AppGiaiHanHD extends Component {
         this.loadHD()
     }
 
-    // componentDidUpdate() {
-    //     //this.loadNV()
-    //     this.loadHD()
-    // }
+    componentDidUpdate() {
+        //this.loadNV()
+        this.loadHD()
+    }
 
     loadNV() {
         fetch('https://localhost:44390/api/nhanviens')
@@ -141,7 +141,7 @@ export class AppGiaiHanHD extends Component {
             nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail, nvhinh, nvtrangthaiHdthuViec,
             nvtrangthaiHdChinhThuc, nvtinhtranghonnhan, nvngaysinh, nvnoisinh,
             nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich,
-            nvnoidaotao, nvdantoc, nvdcthuongtru, nvdaotao } = this.state
+            nvnoidaotao, nvdantoc, nvdcthuongtru, nvdaotao, nvusername ,nvqdbn } = this.state
 
         // var date = new Date()
         // var ngay = date.getDate()
@@ -206,12 +206,14 @@ export class AppGiaiHanHD extends Component {
                                             //nvnganhhoc: nv.nganhHoc,
                                             nvnoidaotao: nv.noiDaoTao,
                                             //nvxeploai: nv.xepLoai,
+                                            nvusername: nv.username,
                                             nvdantoc: nv.iddanToc,
                                             nvdaotao: nv.idtrinhDo,
                                             nvquoctich: nv.quocTich,
                                             nvcv: nv.idchucVu,
                                             nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc,
-                                            nvhinh: nv.hinhAnh
+                                            nvhinh: nv.hinhAnh,
+                                            nvqdbn: nv.idquyetDinhBn
                                         })}
                                     >Gia hạn
                                         </Button>
@@ -293,6 +295,7 @@ export class AppGiaiHanHD extends Component {
                                         //nvnganhhoc={nvnganhhoc}
                                         nvnoidaotao={nvnoidaotao}
                                         //nvxeploai={nvxeploai}
+                                        nvusername={nvusername}
                                         nvdantoc={nvdantoc}
                                         nvdaotao={nvdaotao}
                                         nvngaysinh={nvngaysinh}
@@ -300,6 +303,7 @@ export class AppGiaiHanHD extends Component {
                                         nvcv={nvcv}
                                         nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
                                         nvpic={nvhinh}
+                                        nvqdbn={nvqdbn}
                                     />
 
                                     <ShowGiaiHanHDModal
@@ -395,12 +399,14 @@ export class AppGiaiHanHD extends Component {
                                             //nvnganhhoc: nv.nganhHoc,
                                             nvnoidaotao: nv.noiDaoTao,
                                             //nvxeploai: nv.xepLoai,
+                                            nvusername: nv.username,
                                             nvdantoc: nv.iddanToc,
                                             nvdaotao: nv.idtrinhDo,
                                             nvquoctich: nv.quocTich,
                                             nvcv: nv.idchucVu,
                                             nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc,
-                                            nvhinh: nv.hinhAnh
+                                            nvhinh: nv.hinhAnh,
+                                            nvqdbn: nv.idquyetDinhBn
                                         })}
                                     >Gia hạn
                                     </Button>
@@ -482,6 +488,7 @@ export class AppGiaiHanHD extends Component {
                                         //nvnganhhoc={nvnganhhoc}
                                         nvnoidaotao={nvnoidaotao}
                                         //nvxeploai={nvxeploai}
+                                        nvusername={nvusername}
                                         nvdantoc={nvdantoc}
                                         nvdaotao={nvdaotao}
                                         nvngaysinh={nvngaysinh}
@@ -489,6 +496,7 @@ export class AppGiaiHanHD extends Component {
                                         nvcv={nvcv}
                                         nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
                                         nvpic={nvhinh}
+                                        nvqdbn={nvqdbn}
                                     />
 
                                     <ShowGiaiHanHDModal
@@ -593,12 +601,14 @@ export class AppGiaiHanHD extends Component {
                                                 //nvnganhhoc: nv.nganhHoc,
                                                 nvnoidaotao: nv.noiDaoTao,
                                                 //nvxeploai: nv.xepLoai,
+                                                nvusername: nv.username,
                                                 nvdantoc: nv.iddanToc,
                                                 nvdaotao: nv.idtrinhDo,
                                                 nvquoctich: nv.quocTich,
                                                 nvcv: nv.idchucVu,
                                                 nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc,
-                                                nvhinh: nv.hinhAnh
+                                                nvhinh: nv.hinhAnh,
+                                                nvqdbn: nv.idquyetDinhBn
                                             })}
                                         >Gia hạn
                                         </Button>
@@ -680,6 +690,7 @@ export class AppGiaiHanHD extends Component {
                                             //nvnganhhoc={nvnganhhoc}
                                             nvnoidaotao={nvnoidaotao}
                                             //nvxeploai={nvxeploai}
+                                            nvusername={nvusername}
                                             nvdantoc={nvdantoc}
                                             nvdaotao={nvdaotao}
                                             nvngaysinh={nvngaysinh}
@@ -687,6 +698,7 @@ export class AppGiaiHanHD extends Component {
                                             nvcv={nvcv}
                                             nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
                                             nvpic={nvhinh}
+                                            nvqdbn={nvqdbn}
                                         />
 
                                         <ShowGiaiHanHDModal
@@ -782,12 +794,14 @@ export class AppGiaiHanHD extends Component {
                                                 //nvnganhhoc: nv.nganhHoc,
                                                 nvnoidaotao: nv.noiDaoTao,
                                                 //nvxeploai: nv.xepLoai,
+                                                nvusername: nv.username,
                                                 nvdantoc: nv.iddanToc,
                                                 nvdaotao: nv.idtrinhDo,
                                                 nvquoctich: nv.quocTich,
                                                 nvcv: nv.idchucVu,
                                                 nvtrangthaiHdChinhThuc: nv.trangthaiHdchinhThuc,
-                                                nvhinh: nv.hinhAnh
+                                                nvhinh: nv.hinhAnh,
+                                                nvqdbn: nv.idquyetDinhBn
                                             })}
                                         >Gia hạn
                                         </Button>
@@ -869,6 +883,7 @@ export class AppGiaiHanHD extends Component {
                                             //nvnganhhoc={nvnganhhoc}
                                             nvnoidaotao={nvnoidaotao}
                                             //nvxeploai={nvxeploai}
+                                            nvusername={nvusername}
                                             nvdantoc={nvdantoc}
                                             nvdaotao={nvdaotao}
                                             nvngaysinh={nvngaysinh}
@@ -876,6 +891,7 @@ export class AppGiaiHanHD extends Component {
                                             nvcv={nvcv}
                                             nvtrangthaiHdChinhThuc={nvtrangthaiHdChinhThuc}
                                             nvpic={nvhinh}
+                                            nvqdbn={nvqdbn}
                                         />
 
                                         <ShowGiaiHanHDModal

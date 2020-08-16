@@ -44,6 +44,7 @@ export class AppThoiViec extends Component {
             hds: [],
             loaihds: [],
             nhanviens: [],
+            taikhoans:[],
 
             chonLoaiHD: '',
 
@@ -59,11 +60,20 @@ export class AppThoiViec extends Component {
         this.loadPB()
         this.loadLoaiHD()
         this.loadHD()
+        this.loadTK()
     }
 
     componentDidUpdate() {
         //this.loadNV()
         this.loadHD()
+    }
+
+    loadTK() {
+        fetch('https://localhost:44390/api/taikhoans')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ taikhoans: data });
+            });
     }
 
     loadNV() {
@@ -128,6 +138,15 @@ export class AppThoiViec extends Component {
         return idNVofHD
     }
 
+    checkTonTaiTK(userNV) {
+        for (let i = 0; i < this.state.taikhoans.length; i++) {
+            if (this.state.taikhoans[i].username == userNV) {
+                return true
+            }
+        }
+        return false
+    }
+
     // Hủy hợp đồng sẽ đổi  
     //  + ghiChu trong bảng HopDong thành "Hủy"
     //  + 2 trangthai trong bảng NhanVien sẽ thành Null
@@ -171,7 +190,7 @@ export class AppThoiViec extends Component {
                     email: this.state.nhanviens[i].email,
                     soDienThoai: this.state.nhanviens[i].soDienThoai,
                     noiDaoTao: this.state.nhanviens[i].noiDaoTao,/////////
-                    //username
+                    username:null,
                     idphongBan: parseInt(this.state.nhanviens[i].idphongBan),
                     idchucVu: parseInt(this.state.nhanviens[i].idchucVu),
                     trangthaiHdthuViec: "Đã thôi việc",
@@ -186,6 +205,9 @@ export class AppThoiViec extends Component {
         //console.log(arrayNV)
 
         if (window.confirm('Bạn có chắc muốn hủy?')) {
+            if(this.checkTonTaiTK(idnv)){
+                axios.delete('https://localhost:44390/api/taikhoans/' + idnv)
+            }
             axios.put('https://localhost:44390/api/hopdongs/mangput', arrayHD)
             axios.put('https://localhost:44390/api/nhanviens/mangput', arrayNV)
                 .then(response => {
@@ -452,7 +474,9 @@ export class AppThoiViec extends Component {
                     if (hd.idloaiHd == this.state.chonLoaiHD
                         && nv.idnhanVien == hd.idnhanVien
                         && this.state.chonLoaiHD == 2
-                        && hd.ghiChu == "Ký") { //chính thức
+                        && hd.ghiChu == "Ký"
+                        && (nv.username != "adminNS" && nv.username != "adminTC")
+                        ) { //chính thức
                         if (parseInt(differenceInDays(new Date(hd.ngayHetHan), new Date(DMY))) < 0
                         ) {
                             return (

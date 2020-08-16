@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AppCSS from '../../../../AppCSS.css'
-import { format, endOfMonth } from 'date-fns'
+import { format, getMonth, getYear, endOfMonth } from 'date-fns'
 
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -44,7 +44,9 @@ export class AddLapQuyetDinhKiLuat extends Component {
         super(props);
 
         this.state = {
-            nhanviens: [],
+            quyetdinhkls: [],
+            bangluongs: [],
+            //nhanviens: [],
             // QDHetHan: 'yyyy-MM-dd',
             QDHetHan: '',
             snackbaropen: false,
@@ -57,43 +59,27 @@ export class AddLapQuyetDinhKiLuat extends Component {
         this.setState({ snackbaropen: false });
     };
 
-    handleSubmit(event) {
-        event.preventDefault();
-        if (
-            event.target.QUYETDINHngaylap.value == ''
-            || event.target.QUYETDINHngayhieuluc.value == ''
-            || isNaN(parseInt(event.target.QUYETDINHtienthuong.value))
-            || parseInt(event.target.QUYETDINHtienthuong.value) <= 0
-        ) {
-            alert("Vui lòng nhập lại!!!")
-        }
-        else {
-            if (window.confirm('Bạn có chắc muốn kỷ luật nhân viên này?')) {
-                fetch('https://localhost:44390/api/quyetdinhkls', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    //tenQuyetDinh: event.target.QUYETDINHten.value,
-                    ngayLap: event.target.QUYETDINHngaylap.value,
-                    hoDem: event.target.QUYETDINHhodem.value,
-                    ten: event.target.QUYETDINHtennv.value,
-                    idnhanVien: parseInt(event.target.QUYETDINHidnhanvien.value),
-                    ngayHieuLuc: event.target.QUYETDINHngayhieuluc.value,
-                    ngayHetHieuLuc: event.target.QUYETDINHngayhethieuluc.value,
-                    noiDung: event.target.QUYETDINHnoidung.value,
-                    soTienPhat: parseInt(event.target.QUYETDINHtienthuong.value),
-                    //ghiChu: event.target.QUYETDINHghichu.value
-                })
-            })
-                .then(res => res.json())
-                .then(() => {
-                    this.setState({ snackbaropen: true, snackbarmsg: "Thành công" });
-                })
-            }
-        }
+    componentDidMount() {
+        this.loadBangLuong()
+        this.loadKiLuat()
+    }
+
+    loadKiLuat() {
+        fetch('https://localhost:44390/api/quyetdinhkls')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ quyetdinhkls: data });
+            });
+
+    }
+
+    loadBangLuong() {
+        fetch('https://localhost:44390/api/bangluongs')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ bangluongs: data });
+            });
+
     }
 
     handleChange = (event) => {
@@ -105,6 +91,73 @@ export class AddLapQuyetDinhKiLuat extends Component {
         this.setState({
             QDHetHan: result
         })
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        var layThangQD = getMonth(new Date(event.target.QUYETDINHngayhethieuluc.value)) + 1
+        var layNamQD = getYear(new Date(event.target.QUYETDINHngayhethieuluc.value))
+        // console.log(event.target.QUYETDINHngayhethieuluc.value);
+        // console.log(layThangQD);
+        // console.log(layNamQD);
+
+        let flag = false
+        // kiểm tra đã đỗ dữ liệu hay chưa
+        // nếu đỗ rồi sẽ không được xóa qdKT
+        for (let i = 0; i < this.state.bangluongs.length; i++) {
+            for (let j = 0; j < this.state.quyetdinhkls.length; j++) {
+                if (this.state.bangluongs[i].thang == layThangQD
+                    && this.state.bangluongs[i].nam == layNamQD
+                    //&& this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkls[j].idnhanVien
+                ) {
+                    flag = true
+                }
+                else {
+                    flag = false
+                }
+            }
+        }
+        if (flag) {
+            alert("Đã đỗ dữ liệu của tháng này. Không thể lập quyết định nữa!!!")
+        }
+        else {
+            if (
+                event.target.QUYETDINHngaylap.value == ''
+                || event.target.QUYETDINHngayhieuluc.value == ''
+                || isNaN(parseInt(event.target.QUYETDINHtienthuong.value))
+                || parseInt(event.target.QUYETDINHtienthuong.value) <= 0
+            ) {
+                alert("Vui lòng nhập lại!!!")
+            }
+            else {
+                if (window.confirm('Bạn có chắc muốn kỷ luật nhân viên này?')) {
+                    fetch('https://localhost:44390/api/quyetdinhkls', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            //tenQuyetDinh: event.target.QUYETDINHten.value,
+                            ngayLap: event.target.QUYETDINHngaylap.value,
+                            hoDem: event.target.QUYETDINHhodem.value,
+                            ten: event.target.QUYETDINHtennv.value,
+                            idnhanVien: parseInt(event.target.QUYETDINHidnhanvien.value),
+                            ngayHieuLuc: event.target.QUYETDINHngayhieuluc.value,
+                            ngayHetHieuLuc: event.target.QUYETDINHngayhethieuluc.value,
+                            noiDung: event.target.QUYETDINHnoidung.value,
+                            soTienPhat: parseInt(event.target.QUYETDINHtienthuong.value),
+                            //ghiChu: event.target.QUYETDINHghichu.value
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(() => {
+                            this.setState({ snackbaropen: true, snackbarmsg: "Thành công" });
+                        })
+                }
+            }
+        }
+
     }
 
     showModalBody() {

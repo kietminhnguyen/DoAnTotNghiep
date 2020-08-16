@@ -51,10 +51,11 @@ export class AppPhongBan extends Component {
     }
 
     componentDidMount() {
-        this.refreshLish();
+        this.loadPB();
+        this.loadNV()
     }
 
-    refreshLish() {
+    loadPB() {
         fetch('https://localhost:44390/api/phongbans')
             .then(response => response.json())
             .then(data => {
@@ -62,7 +63,7 @@ export class AppPhongBan extends Component {
             });
     }
 
-    refreshLishNV() {
+    loadNV() {
         fetch('https://localhost:44390/api/nhanviens')
             .then(response => response.json())
             .then(data => {
@@ -71,34 +72,40 @@ export class AppPhongBan extends Component {
     }
 
     componentDidUpdate() {
-        this.refreshLish();
+        this.loadPB();
     }
 
-
-    deletePhongBan(idpb) {
-        // let co = false
-        // for (let i = 0; i < this.state.nhanviens.length; i++) {
-        //     if (parseInt(phongban.idphongBan) == parseInt(this.state.nhanviens[j].idphongBan)) {
-        //         co = true
-        //     }
-        // }
-        // if (co == true) {
-        //     alert('Không thể xóa vì còn nhân viên trong phòng ban này')
-        // }
-        // else {
-        if (window.confirm('Are your sure!')) {
-            fetch('https://localhost:44390/api/phongbans/' + idpb, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-
+    deletePhongBan = (idpb) => {
+        let co = false
+        for (let i = 0; i < this.state.nhanviens.length; i++) {
+            if (idpb == this.state.nhanviens[i].idphongBan) {
+                co = true
+            }
         }
-        // }
-        //////////////////
+        if (co) {
+            alert('Không thể xóa vì còn nhân viên trong phòng ban này')
+        }
+        else {
+            if (window.confirm('Bạn có chắc muốn xóa phòng ban này')) {
+                fetch('https://localhost:44390/api/phongbans/' + idpb, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+        }
+    }
 
+    layTenTruongPhong = (id) => {
+        for (let i = 0; i < this.state.nhanviens.length; i++) {
+            if (id == this.state.nhanviens[i].idnhanVien
+            ) {
+                id = this.state.nhanviens[i].hoDem + " " + this.state.nhanviens[i].ten
+            }
+        }
+        return id
     }
 
     render() {
@@ -136,7 +143,7 @@ export class AppPhongBan extends Component {
                             <StyledTableRow>
                                 {/* <StyledTableCell>#</StyledTableCell> */}
                                 <StyledTableCell align="center">Tên Phòng Ban</StyledTableCell>
-                                <StyledTableCell align="center">Trưởng phòng</StyledTableCell>
+                                {/* <StyledTableCell align="center">Trưởng phòng</StyledTableCell> */}
                                 <StyledTableCell align="center">Mô tả</StyledTableCell>
                                 <StyledTableCell align="center">Chức năng</StyledTableCell>
                             </StyledTableRow>
@@ -146,7 +153,7 @@ export class AppPhongBan extends Component {
                                 <StyledTableRow>
                                     {/* <td>{key + 1}</td> */}
                                     <StyledTableCell align="center">{phongban.tenPhongBan}</StyledTableCell>
-                                    <StyledTableCell align="center">{phongban.tenTruongPhong}</StyledTableCell>
+                                    {/* <StyledTableCell align="center">{phongban.tenTruongPhong}</StyledTableCell> */}
                                     <StyledTableCell align="center">{phongban.moTa}</StyledTableCell>
                                     <StyledTableCell align="center">
                                         <ButtonGroup variant="text">

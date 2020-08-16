@@ -104,7 +104,8 @@ export class AddGiaiHanHDModal extends Component {
                 ngayLapHd: event.target.HopdongKY.value,
                 ngayBatDau: event.target.HopdongBD.value,
                 ngayHetHan: event.target.HopdongKT.value,
-                ghiChu: null,
+                // ghiChu: null,
+                ghiChu: "Ký",
                 idloaiHd: 2,
                 idnhanVien: parseInt(event.target.NhanvienID.value),
             })
@@ -131,7 +132,7 @@ export class AddGiaiHanHDModal extends Component {
                 //nganhHoc: this.props.nvnganhhoc,
                 noiDaoTao: this.props.nvnoidaotao + " & gia hạn", ///////
                 //xepLoai: this.props.nvxeploai,
-                //username
+                username: this.props.nvusername,
                 idphongBan: this.props.nvpb,
                 idchucVu: this.props.nvcv,
                 //idquanHeGd
@@ -139,7 +140,7 @@ export class AddGiaiHanHDModal extends Component {
                 trangthaiHdchinhThuc: "Đã ký",
                 iddanToc: this.props.nvdantoc,
                 idtrinhDo: this.props.nvdaotao,
-                //idquyetDinhBn
+                idquyetDinhBn: this.props.nvqdbn
             })
             alert("Thành công")
         }

@@ -4,6 +4,7 @@ import EditIcon from "@material-ui/icons/Edit"
 import DeleteIcon from "@material-ui/icons/Delete"
 import { withStyles } from '@material-ui/core/styles'
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+//import axios from 'axios';
 
 import { AddChucVuModal } from './AddChucVuModal';
 import { EditChucVuModal } from './EditChucVuModal';
@@ -49,10 +50,11 @@ export class AppChucVu extends Component {
     }
 
     componentDidMount() {
-        this.refreshLish();
+        this.loadCV();
+        this.loadNV();
     }
 
-    refreshLish() {
+    loadCV() {
         fetch('https://localhost:44390/api/chucvus')
             .then(response => response.json())
             .then(data => {
@@ -60,39 +62,48 @@ export class AppChucVu extends Component {
             });
     }
 
+    loadNV() {
+        fetch('https://localhost:44390/api/nhanviens')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ nhanviens: data });
+            });
+    }
+
     componentDidUpdate() {
-        this.refreshLish();
+        this.loadCV();
     }
 
 
-    xoaChucVu(idcv) {
-        // let co = false
-        // for (let i = 0; i < this.state.nhanviens.length; i++) {
-        //     if (parseInt(phongban.idphongBan) == parseInt(this.state.nhanviens[j].idphongBan)) {
-        //         co = true
-        //     }
-        // }
-        // if (co == true) {
-        //     alert('Không thể xóa vì còn nhân viên trong phòng ban này')
-        // }
-        // else {
-        if (window.confirm('Are your sure!')) {
-            fetch('https://localhost:44390/api/chucvus/' + idcv, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-
+    xoaChucVu = (idcv) => {
+        let co = false
+        for (let i = 0; i < this.state.nhanviens.length; i++) {
+            if (idcv == parseInt(this.state.nhanviens[i].idchucVu)) {
+                co = true
+            }
         }
-        // }
+        if (co == true) {
+            alert('Không thể xóa vì còn nhân viên đang giữa chức vụ này này')
+        }
+        else {
+            if (window.confirm('Bạn có chắc muốn xóa')) {
+                //axios.delete('https://localhost:44390/api/chucvus/' + idcv)
+                fetch('https://localhost:44390/api/chucvus/' + idcv, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+            }
+        }
 
     }
 
     render() {
 
-        const { chucvus, cvid, cvten, cvmota } = this.state;
+        const { chucvus, cvid, cvten, cvmota, cvheso } = this.state;
         let addModalClose = () => this.setState({ addModalShow: false });
         let editModalClose = () => this.setState({ editModalShow: false });
         return (
@@ -123,6 +134,7 @@ export class AppChucVu extends Component {
                             <StyledTableRow>
                                 {/* <th>#</th> */}
                                 <StyledTableCell>Tên chức vụ</StyledTableCell>
+                                <StyledTableCell align="center">Hệ số chức vụ</StyledTableCell>
                                 <StyledTableCell align="center">Mô tả</StyledTableCell>
                                 <StyledTableCell align="center">Chức năng</StyledTableCell>
                             </StyledTableRow>
@@ -132,6 +144,7 @@ export class AppChucVu extends Component {
                                 <StyledTableRow>
                                     {/* <td>{key + 1}</td> */}
                                     <StyledTableCell>{cv.tenChucVu}</StyledTableCell>
+                                    <StyledTableCell align="center">{cv.heSoChucVu}</StyledTableCell>
                                     <StyledTableCell align="center">{cv.moTa}</StyledTableCell>
                                     <StyledTableCell align="center">
                                         <ButtonGroup variant="text">
@@ -143,6 +156,7 @@ export class AppChucVu extends Component {
                                                         cvid: cv.idchucVu,
                                                         cvten: cv.tenChucVu,
                                                         cvmota: cv.moTa,
+                                                        cvheso: cv.heSoChucVu,
                                                     })}
                                                 ></EditIcon>
                                             </Button>
@@ -173,6 +187,7 @@ export class AppChucVu extends Component {
                                                 cvid={cvid}
                                                 cvten={cvten}
                                                 cvmota={cvmota}
+                                                cvheso={cvheso}
                                             />
                                         </ButtonGroup>
                                     </StyledTableCell>

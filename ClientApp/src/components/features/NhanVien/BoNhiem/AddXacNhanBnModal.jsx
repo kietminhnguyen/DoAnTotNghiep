@@ -88,8 +88,26 @@ export class AddXacNhanBnModal extends Component {
         }
     }
 
+    // checkTruongPhong(idpb, idcv) {
+    //     for (let i = 0; i < this.state.nhanviens.length; i++) {
+    //         if (
+    //             idpb == this.state.nhanviens[i].idphongBan
+    //             && idcv == 4
+    //         ) {
+    //             return true
+    //         }
+    //     }
+    //     return false
+    // }
+
     themuv(event) {
         event.preventDefault();
+        // if (this.checkTruongPhong(parseInt(event.target.NhanvienPB.value),
+        //     parseInt(event.target.NhanvienCV.value))
+        // ) {
+        //     alert("Phòng ban này đã có trưởng phòng")
+        // }
+        // else {
         axios.post('https://localhost:44390/api/Nhanviens', {
             hoDem: this.props.uvho,
             ten: this.props.uvten,
@@ -128,6 +146,8 @@ export class AddXacNhanBnModal extends Component {
             ghiChu: event.target.QDBNghichu.value,
             idungVien: this.props.bniduv,
         })
+        //}
+
     }
 
     suaUngVien(iduv) {

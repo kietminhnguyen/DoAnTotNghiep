@@ -116,7 +116,8 @@ export class AppLapQuyetDinh extends Component {
         var DMY = format(new Date(), 'yyyy-MM-dd')
         return nhanviens.map(nv => {
             return hds.map(hd => {
-                if (nv.idphongBan == this.state.chonPB
+                if (nv.username != "adminNS" && nv.username != "adminTC"
+                    && nv.idphongBan == this.state.chonPB
                     //|| this.state.chonPB == '')
                     && nv.trangthaiHdchinhThuc != null
                     && (hd.idloaiHd == 2

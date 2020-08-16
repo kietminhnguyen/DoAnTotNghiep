@@ -113,7 +113,7 @@ export class AddHDChinhThucModal extends Component {
                 //nganhHoc: this.props.nvnganhhoc,
                 noiDaoTao: this.props.nvnoidaotao,
                 //xepLoai: this.props.nvxeploai,
-                //username
+                username: this.props.nvusername,
                 idphongBan: this.props.nvpb,
                 idchucVu: this.props.nvcv,
                 //idquanHeGd
@@ -121,7 +121,7 @@ export class AddHDChinhThucModal extends Component {
                 trangthaiHdchinhThuc: "Đã ký",
                 iddanToc: this.props.nvdantoc,
                 idtrinhDo: this.props.nvdaotao,
-                //idquyetDinhBn
+                idquyetDinhBn: this.props.nvqdbn
             })
             alert("Thành công")
         }

@@ -10,6 +10,7 @@ import { format, getMonth, getYear } from 'date-fns';
 import axios from 'axios';
 
 import { EditQuyetDinhKiLuat } from './EditQuyetDinhKiLuat';
+import { InQuyetDinhKiLuat } from './InQuyetDinhKiLuat';
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
@@ -43,11 +44,13 @@ export class AppQuyetDinhKiLuat extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            bangluongs:[],
             nhanviens: [],
             quyetdinhkls: [],
             ThangNamQuyetDinh: '',
             addModalShow: false,
             editModalShow: false,
+            InModalShow: false
             // showModalShow: false
         }
         this.handleChange = this.handleChange.bind(this)
@@ -56,6 +59,7 @@ export class AppQuyetDinhKiLuat extends Component {
     componentDidMount() {
         this.loadKiLuat()
         this.loadNV()
+        this.loadBangLuong()
     }
     componentDidUpdate() {
         this.loadKiLuat()
@@ -69,6 +73,15 @@ export class AppQuyetDinhKiLuat extends Component {
             });
     }
 
+    loadBangLuong() {
+        fetch('https://localhost:44390/api/bangluongs')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ bangluongs: data });
+            });
+
+    }
+
     loadKiLuat() {
         fetch('https://localhost:44390/api/quyetdinhkls')
             .then(response => response.json())
@@ -79,13 +92,16 @@ export class AppQuyetDinhKiLuat extends Component {
     }
 
     deleteQuyetDinh(idkl) {
+        var layThangDaChon = getMonth(new Date(this.state.ThangNamQuyetDinh)) + 1
+        var layNamDaChon = getYear(new Date(this.state.ThangNamQuyetDinh))
+
         let flag = false
         // kiểm tra đã đỗ dữ liệu hay chưa
         // nếu đỗ rồi sẽ không được xóa qdKT
         for (let i = 0; i < this.state.bangluongs.length; i++) {
             for (let j = 0; j < this.state.quyetdinhkls.length; j++) {
-                if (this.state.bangluongs[i].thang == this.state.quyetdinhkls[j].ngayHieuLuc.substring(5, 7)
-                    && this.state.bangluongs[i].nam == this.state.quyetdinhkls[j].ngayHieuLuc.substring(0, 4)
+                if (this.state.bangluongs[i].thang == layThangDaChon
+                    && this.state.bangluongs[i].nam == layNamDaChon
                     && this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkls[j].idnhanVien
                 ) {
                     flag = true
@@ -93,7 +109,7 @@ export class AppQuyetDinhKiLuat extends Component {
             }
         }
         if (flag) {
-            alert("Đã khóa bảng lương không thể xóa")
+            alert("Đã đỗ dữ liệu của tháng này. Không thể xóa!!!")
         }
         else {
             if (window.confirm('Bạn có chắc muốn xóa quyết định này?')) {
@@ -108,10 +124,6 @@ export class AppQuyetDinhKiLuat extends Component {
                     })
             }
         }
-    }
-
-    inquyetdinh() {
-        window.alert("Chức năng đang hoàn thiện. Vui lòng chờ cập nhật!")
     }
 
     handleChange = (event) => {
@@ -139,6 +151,7 @@ export class AppQuyetDinhKiLuat extends Component {
         const { nhanviens, quyetdinhkls, qdidkl, qdidnv, qdhodem, qdtennv, qdten, qdtienphat, qdngyathanhlap,
             qdngayhieuluc, qdngayhethieuluc, qdnoidung, qdghichu, nvgioitinh, nvhinh } = this.state;
         let editModalClose = () => this.setState({ editModalShow: false })
+        let InModalClose = () => this.setState({ InModalShow: false })
 
         const formatter = new Intl.NumberFormat('de-DE', {
             style: 'currency',
@@ -191,11 +204,32 @@ export class AppQuyetDinhKiLuat extends Component {
                                             onClick={() => this.deleteQuyetDinh(qd.idquyetDinhKl)}>
                                         </DeleteIcon>
                                     </Button>
+
                                     <Button>
                                         <PrintIcon color="inherit"
-                                        //onClick={() => this.inquyetdinh()}
-                                        ></PrintIcon>
+                                            onClick={() => this.setState({
+                                                InModalShow: true,
+                                                qdhodem: qd.hoDem,
+                                                qdtennv: qd.ten,
+                                                qdten: qd.tenQuyetDinh,
+                                                qdtienphat: qd.soTienPhat,
+                                                qdngyathanhlap: format(new Date(qd.ngayLap), 'dd-MM-yyyy'),
+                                                qdngayhieuluc: format(new Date(qd.ngayHieuLuc), 'dd-MM-yyyy'),
+                                                qdnoidung: qd.noiDung
+                                            })}>
+                                        </PrintIcon>
                                     </Button>
+                                    <InQuyetDinhKiLuat
+                                        show={this.state.InModalShow}
+                                        onHide={InModalClose}
+                                        qdhodem={qdhodem}
+                                        qdtennv={qdtennv}
+                                        qdten={qdten}
+                                        qdtienphat={qdtienphat}
+                                        qdngyathanhlap={qdngyathanhlap}
+                                        qdngayhieuluc={qdngayhieuluc}
+                                        qdnoidung={qdnoidung}
+                                    />
 
                                     <EditQuyetDinhKiLuat
                                         show={this.state.editModalShow}

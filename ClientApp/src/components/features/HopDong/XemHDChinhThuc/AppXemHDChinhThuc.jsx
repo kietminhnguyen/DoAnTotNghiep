@@ -7,8 +7,10 @@ import {
 } from '@material-ui/core'
 import DeleteIcon from "@material-ui/icons/Delete"
 import { withStyles } from '@material-ui/core/styles'
+import PrintIcon from '@material-ui/icons/Print';
 
 import { format, differenceInDays } from 'date-fns'
+import { InHopDongChinhThuc } from './InHopDongChinhThuc'
 
 //import { ShowXemHDThuViecModal } from './ShowXemHDThuViecModal'
 
@@ -52,6 +54,7 @@ export class AppXemHDChinhThuc extends Component {
             // addModalShow: false,
             // editModalShow: false,
             // showModalShow: false
+            InModalShow: false
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleChangeCheck = this.handleChangeCheck.bind(this)
@@ -62,7 +65,7 @@ export class AppXemHDChinhThuc extends Component {
         this.loadPB()
         this.loadHD()
     }
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.loadHD()
     }
 
@@ -192,12 +195,20 @@ export class AppXemHDChinhThuc extends Component {
     }
 
     showTableDate = () => {
+
+        const { hdid, hdky, hdbatdau, hdketthuc, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvmail,
+            nvtrangthaiHdthuViec, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru,
+            nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvnganhhoc,
+            nvnoidaotao, nvxeploai, nvdantoc, nvdaotao } = this.state
+        let InModalClose = () => this.setState({ InModalShow: false })
+
         const { hds, nvs } = this.state
         var DMY = format(new Date(), 'yyyy-MM-dd')
         return hds.map(hd => {
             return nvs.map(nv => {
                 if (this.state.chonRadio == "Chưa hủy"
                     && hd.ghiChu == "Ký"
+                    && nv.username != "adminNS" && nv.username != "adminTC"
                 ) {
                     if (hd.idloaiHd == 2
                         && hd.idnhanVien == nv.idnhanVien
@@ -213,6 +224,12 @@ export class AppXemHDChinhThuc extends Component {
                                 <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
                                 <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
                                 <StyledTableCell >Đã hết hạn</StyledTableCell>
+                                <StyledTableCell align="center">
+                                    {/* <Button>
+                                        <PrintIcon color="inherit"></PrintIcon>
+                                    </Button> */}
+                                </StyledTableCell>
+
                             </StyledTableRow>)
                     }
                     else if (hd.idloaiHd == 2
@@ -229,12 +246,56 @@ export class AppXemHDChinhThuc extends Component {
                                 <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
                                 <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
                                 <StyledTableCell>Còn lại {differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))} ngày</StyledTableCell>
+                                <StyledTableCell align="center">
+                                    <Button>
+                                        <PrintIcon color="inherit"
+                                            onClick={() => this.setState({
+                                                InModalShow: true,
+                                                nvho: nv.hoDem,
+                                                nvten: nv.ten,
+                                                nvngaysinh: format(new Date(nv.ngaySinh), 'dd-MM-yyyy'),
+                                                nvgioitinh: nv.gioiTinh,
+                                                nvdcthuongtru: nv.diaChiThuongTru,
+                                                nvchohientai: nv.choOhienTai,
+                                                nvtongiao: nv.tonGiao,
+                                                nvdantoc: nv.iddanToc,
+                                                nvsocmnd: nv.soCmnn,
+                                                nvngaycap: format(new Date(nv.ngayCap), 'dd-MM-yyyy'),
+                                                nvnoicap: nv.noiCap,
+                                                nvsdt: nv.soDienThoai,
+                                                nvmail: nv.email,
+                                                hdbatdau: format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')
+                                            })}
+                                        >
+                                        </PrintIcon>
+                                        <InHopDongChinhThuc
+                                            show={this.state.InModalShow}
+                                            onHide={InModalClose}
+                                            nvho={nvho}
+                                            nvten={nvten}
+                                            nvngaysinh={nvngaysinh}
+                                            nvgioitinh={nvgioitinh}
+                                            nvdcthuongtru={nvdcthuongtru}
+                                            nvchohientai={nvchohientai}
+                                            nvtongiao={nvtongiao}
+                                            nvdantoc={nvdantoc}
+                                            nvsocmnd={nvsocmnd}
+                                            nvngaycap={nvngaycap}
+                                            nvnoicap={nvnoicap}
+                                            nvsdt={nvsdt}
+                                            nvmail={nvmail}
+                                            hdbatdau={hdbatdau}
+                                        />
+                                    </Button>
+                                </StyledTableCell>
+
                             </StyledTableRow>)
                     }
                 }
                 else {
                     if (this.state.chonRadio == "Đã hủy"
                         && hd.ghiChu == "Hủy"
+                        && nv.username != "adminNS" && nv.username != "adminTC"
                     ) {
                         if (hd.idloaiHd == 2
                             && hd.idnhanVien == nv.idnhanVien
@@ -250,7 +311,7 @@ export class AppXemHDChinhThuc extends Component {
                                     <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
                                     <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
                                     <StyledTableCell >Đã hết hạn</StyledTableCell>
-                                    <StyledTableCell >{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
+                                    <StyledTableCell align="center">{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
                                 </StyledTableRow>)
                         }
                         else if (hd.idloaiHd == 2
@@ -267,7 +328,8 @@ export class AppXemHDChinhThuc extends Component {
                                     <StyledTableCell>{format(new Date(hd.ngayBatDau), 'dd-MM-yyyy')}</StyledTableCell>
                                     <StyledTableCell>{format(new Date(hd.ngayHetHan), 'dd-MM-yyyy')}</StyledTableCell>
                                     <StyledTableCell>Còn lại {differenceInDays(new Date(hd.ngayHetHan.substring(0, 10)), new Date(DMY))} ngày</StyledTableCell>
-                                    <StyledTableCell >{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
+                                    <StyledTableCell align="center">{this.checkBtnXoaHD(nv.idnhanVien)}</StyledTableCell>
+
                                 </StyledTableRow>)
                         }
                     }
@@ -313,11 +375,12 @@ export class AppXemHDChinhThuc extends Component {
                                 <StyledTableCell>Ngày bắt đầu</StyledTableCell>
                                 <StyledTableCell>Ngày kết thúc</StyledTableCell>
                                 <StyledTableCell>Hạn hợp đồng</StyledTableCell>
-                                {/* <StyledTableCell>Chức năng</StyledTableCell> */}
+                                <StyledTableCell>Chức năng</StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>
                             {this.showTableDate()}
+
                         </TableBody>
                     </StyledTable>
                 </TableContainer>

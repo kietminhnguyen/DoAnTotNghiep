@@ -160,6 +160,7 @@ export class AppHDThuViec extends Component {
         return nvs.map(nv => {
             if (nv.noiDaoTao == "Bổ nhiệm"
                 && nv.idphongBan == this.state.chonPB
+                && nv.username != "adminNS" && nv.username != "adminTC"
                 //|| this.state.chonPB == ''
             ) {
                 return (

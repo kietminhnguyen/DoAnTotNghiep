@@ -11,6 +11,8 @@ import EditIcon from "@material-ui/icons/Edit"
 import DeleteIcon from "@material-ui/icons/Delete"
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import PrintIcon from '@material-ui/icons/Print';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import { format } from 'date-fns'
 
 import { EditNhanVienModal } from './EditNhanVienModal'
 import { ShowNhanVienModal } from './ShowNhanVienModal'
@@ -49,6 +51,7 @@ export class AppNhanVien extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            taikhoans: [],
             qdbns: [],
             hopdongs: [],
             pbs: [],
@@ -71,11 +74,20 @@ export class AppNhanVien extends Component {
         this.loadHD()
         this.loadQDBN()
         this.loadUV()
+        this.loadTK()
     }
 
     componentDidUpdate() {
         this.loadNV()
         //this.loadPB()
+    }
+
+    loadTK() {
+        fetch('https://localhost:44390/api/taikhoans')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ taikhoans: data });
+            });
     }
 
     loadUV() {
@@ -87,6 +99,16 @@ export class AppNhanVien extends Component {
     }
 
     loadNV() {
+        // axios.get('https://localhost:44390/api/nhanviens')
+        // .then(response => {
+        //     //console.log(response)
+        //     this.setState({ nhanviens: response.data })
+        // })
+        // .catch(error => {
+        //     //console.log(error)
+        //     //this.setState({ showError: "Lỗi lấy dữ liệu" })
+        //     //console.log(this.state.showError)
+        // })
         fetch('https://localhost:44390/api/nhanviens')
             .then(response => response.json())
             .then(data => {
@@ -247,8 +269,8 @@ export class AppNhanVien extends Component {
     }
     //**************************************************************************** */
 
-    /* Xóa nv đã ký hd chính thức mà đã thôi việc */
-    xoaHD(idhd, idnv) {
+    /* Xóa nv đã ký hd chính thức mà đã thôi việc *****************************/
+    xoaHD(idhd, idnv) {/// bỏ do đã có xóa hđ bên màn hình xem hd
         if (window.confirm('Bạn có chắc muốn xóa hợp đồng của nhân viên này?')) {
             axios.delete('https://localhost:44390/api/hopdongs/' + idhd)
 
@@ -294,6 +316,30 @@ export class AppNhanVien extends Component {
         }
     }
 
+    xoaNVxoaQDBNxoaUV(idnv, idqd, iduv) { // nv thử việc này đã bị thôi việc
+        if (window.confirm('Bạn có chắc muốn xóa?')) {
+            // fetch('https://localhost:44390/api/nhanviens/' + idnv, {
+            //     method: 'DELETE',
+            //     headers: {
+            //         'Accept': 'application/json',
+            //         'Content-Type': 'application/json'
+            //     }
+            // })
+            axios.delete('https://localhost:44390/api/nhanviens/' + idnv)
+
+            axios.delete('https://localhost:44390/api/quyetdinhbonhiems/' + idqd)
+
+            axios.delete('https://localhost:44390/api/ungviens/' + iduv)
+
+            alert("Xóa thành công")
+        }
+    }
+
+    xoaNVdaThoiViec(idnv) { // Xóa bangLuong, chamCong, chamCongTangCa, quyetDinhKl, quyetDinhKt, tamUngLuong
+        
+    }
+
+    // Bỏ do dính nhiều khóa ngoại
     checkBtnXoaNV(idnv) {
         return this.state.nhanviens.map(nv => {
             if (idnv == nv.idnhanVien  /// hợp đồng CHÍNH THỨC
@@ -306,19 +352,138 @@ export class AppNhanVien extends Component {
                     /></Button>)
             }
             else { /// Xóa nv chưa ký hợp đồng THỬ VIỆC. xóa nv & xóa qdbn & sửa trạng thái uv thành "Chưa"
-                //return this.state.qdbns.map(qd => {
-                //return this.state.ungviens.map(uv => {
-                if (idnv == nv.idnhanVien  /// hợp đồng THỬ VIỆC
-                    && nv.noiDaoTao == "Bổ nhiệm"
-                    && (nv.trangthaiHdthuViec == "Đã xóa hđ" && nv.trangthaiHdchinhThuc == "Đã xóa hđ")
-                ) {
-                    return (
-                        <Button><DeleteIcon color="secondary"
-                            onClick={() => this.xoaNV(nv.idnhanVien)}
-                        /></Button>)
-                }
-                //})
-                //})
+                return this.state.qdbns.map(qd => {
+                    return this.state.ungviens.map(uv => {
+                        if (idnv == nv.idnhanVien
+                            && nv.noiDaoTao == "Bổ nhiệm"
+                            && (nv.trangthaiHdthuViec == "Đã xóa hđ" && nv.trangthaiHdchinhThuc == "Đã xóa hđ")
+                            && nv.idquyetDinhBn == qd.idquyetDinhBn
+                            && uv.idungVien == qd.idungVien
+                        ) {
+                            return (
+                                <Button><DeleteIcon color="secondary"
+                                    onClick={() => this.xoaNVvaQDBNsuaUV(nv.idnhanVien,
+                                        qd.idquyetDinhBn, uv.idungVien)}
+                                /></Button>)
+                        }
+                    })
+                })
+            }
+
+            // else { /// Xóa nv chưa ký hợp đồng THỬ VIỆC. xóa nv & xóa qdbn & sửa trạng thái uv thành "Chưa"
+            //     //return this.state.qdbns.map(qd => {
+            //     //return this.state.ungviens.map(uv => {
+            //     if (idnv == nv.idnhanVien  /// hợp đồng THỬ VIỆC
+            //         && nv.noiDaoTao == "Bổ nhiệm"
+            //         && (nv.trangthaiHdthuViec == "Đã xóa hđ" && nv.trangthaiHdchinhThuc == "Đã xóa hđ")
+            //     ) {
+            //         return (
+            //             <Button><DeleteIcon color="secondary"
+            //                 onClick={() => this.xoaNV(nv.idnhanVien)}
+            //             /></Button>)
+            //     }
+            //     //})
+            //     //})
+            // }
+        })
+    }
+
+    //********* Btn KEY */
+    skBtnKey = (idnvtk) => {
+        //console.log(format(new Date(), 'yyyy-MM-dd'));   
+        let arrayTK = []
+        let arrayNVTK = []
+        for (let i = 0; i < this.state.nhanviens.length; i++) {
+            if (this.state.nhanviens[i].idnhanVien == idnvtk) {
+                arrayTK.push({
+                    //Thêm vào bảng TK
+                    username: this.state.nhanviens[i].idnhanVien,
+                    password: 123,
+                    mail: format(new Date(), 'yyyy-MM-dd'),
+                })
+
+                arrayNVTK.push({
+                    // Sửa username trong bảng NV
+                    idnhanVien: this.state.nhanviens[i].idnhanVien,
+                    hoDem: this.state.nhanviens[i].hoDem,
+                    ten: this.state.nhanviens[i].ten,
+                    tinhTrangHonNhan: this.state.nhanviens[i].tinhTrangHonNhan,
+                    ngaySinh: this.state.nhanviens[i].ngaySinh,
+                    noiSinh: this.state.nhanviens[i].noiSinh,
+                    gioiTinh: this.state.nhanviens[i].gioiTinh,
+                    hinhAnh: this.state.nhanviens[i].hinhAnh,
+                    diaChiThuongTru: this.state.nhanviens[i].diaChiThuongTru,
+                    choOhienTai: this.state.nhanviens[i].choOhienTai,
+                    soCmnn: this.state.nhanviens[i].soCmnn,
+                    ngayCap: this.state.nhanviens[i].ngayCap,
+                    tonGiao: this.state.nhanviens[i].tonGiao,
+                    noiCap: this.state.nhanviens[i].noiCap,
+                    quocTich: this.state.nhanviens[i].quocTich,
+                    email: this.state.nhanviens[i].email,
+                    soDienThoai: this.state.nhanviens[i].soDienThoai,
+                    //nganhHoc: event.target.NhanvienNganhHoc.value,
+                    noiDaoTao: this.state.nhanviens[i].noiDaoTao,
+                    //xepLoai: this.props.,
+                    username: this.state.nhanviens[i].idnhanVien,
+                    idphongBan: this.state.nhanviens[i].idphongBan,
+                    idchucVu: this.state.nhanviens[i].idchucVu,
+                    //idquanHeGd
+                    ////trangThaiHoSo=> 
+                    trangthaiHDThuViec: this.state.nhanviens[i].trangthaiHdthuViec,
+                    trangthaiHDChinhThuc: this.state.nhanviens[i].trangthaiHdchinhThuc,
+                    iddanToc: this.state.nhanviens[i].iddanToc,
+                    idtrinhDo: this.state.nhanviens[i].idtrinhDo,
+                    idquyetDinhBn: this.state.nhanviens[i].idquyetDinhBn,
+                })
+            }
+        }
+        //console.log(arrayTK);
+        //console.log(arrayTK);
+        if (window.confirm('Bạn có chắc muốn cấp tài khoản cho nhân viên này?')) {
+            /////////post taikhoan + put nv
+
+            axios.post("https://localhost:44390/api/taikhoans/mangpost", arrayTK)
+            axios.put("https://localhost:44390/api/nhanviens/mangput", arrayNVTK)
+                .then(response => {
+                    //this.setState({ arrayBL: response.data })
+                    alert("Cấp thành công")
+                })
+                .catch(error => {
+                    //this.setState({ showError: "Lỗi post dữ liệu" })
+                    //alert("Xóa không thành công")
+                })
+        }
+    }
+
+    checkHDChinhThuc(idnv) {
+        // nếu là hd chính thức sẽ đc show btnKey
+        for (let i = 0; i < this.state.hopdongs.length; i++) {
+            if (this.state.hopdongs[i].idloaiHd == 2
+                && parseInt(this.state.hopdongs[i].idnhanVien)  == idnv
+            ) {
+                return true
+            }
+            else {
+                return false
+            }
+        }
+    }
+
+    checkBtnKey(idnv) {
+
+        return this.state.nhanviens.map(nv => {
+            if (idnv == nv.idnhanVien 
+                && nv.username == null 
+                //&& flag == true
+            ) {
+                //idnv = nv.idnhanVien
+                return (
+                    <Button>
+                        <VpnKeyIcon color="secondary"
+                            onClick={() => this.skBtnKey(nv.idnhanVien)}
+                        ></VpnKeyIcon>
+                    </Button>
+                )
             }
         })
     }
@@ -327,170 +492,19 @@ export class AppNhanVien extends Component {
         const { hopdongs, nhanviens, nvpb, nvcv, nvid, nvho, nvten, nvgioitinh, nvsdt, nvthuviec,
             nvmail, nvtinhtranghonnhan, nvngaysinh, nvnoisinh, nvdcthuongtru, nvchinhthuc,
             nvchohientai, nvsocmnd, nvngaycap, nvnoicap, nvtongiao, nvquoctich, nvhinh,
-            nvnoidaotao, nvdantoc, nvdaotao } = this.state
+            nvnoidaotao, nvdantoc, nvdaotao, nvusername, nvqdbn } = this.state
         let editModalClose = () => this.setState({ editModalShow: false })
         let showModalClose = () => this.setState({ showModalShow: false })
         let inModalClose = () => this.setState({ inModalShow: false })
 
         return nhanviens.map(nv => {
-            if (this.state.chonRadio == "Chưa ký" // xem ds nv chưa ký hd
-                && nv.idphongBan == this.state.chonPB
-                //|| this.state.chonPB == '')
-                && nv.trangthaiHdthuViec == null
-                && nv.trangthaiHdchinhThuc == null
-            ) {
-                return (
-                    <StyledTableRow >
-                        {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
-                        <StyledTableCell>{nv.hoDem}</StyledTableCell>
-                        <StyledTableCell>{nv.ten}</StyledTableCell>
-                        <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
-                        <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
-                        <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
-                        <StyledTableCell align="right">
-                            <ButtonGroup variant="text">
-
-                                {this.checkBtnXoaChuaKy(nv.idnhanVien)}
-
-                                <Button>
-                                    <EditIcon color="primary"
-                                        onClick={() => this.setState({
-                                            editModalShow: true,
-                                            nvid: nv.idnhanVien,
-                                            nvpb: nv.idphongBan,
-                                            nvho: nv.hoDem,
-                                            nvten: nv.ten,
-                                            nvgioitinh: nv.gioiTinh,
-                                            nvsdt: nv.soDienThoai,
-                                            nvngaysinh: nv.ngaySinh.substring(0, 10),
-                                            nvtinhtranghonnhan: nv.tinhTrangHonNhan,
-                                            nvdcthuongtru: nv.diaChiThuongTru,
-                                            nvnoisinh: nv.noiSinh,
-                                            nvtongiao: nv.tonGiao,
-                                            nvchohientai: nv.choOhienTai,
-                                            nvsocmnd: nv.soCmnn,
-                                            nvngaycap: nv.ngayCap.substring(0, 10),
-                                            nvnoicap: nv.noiCap,
-                                            nvmail: nv.email,
-                                            //nvnganhhoc: nv.nganhHoc,
-                                            nvnoidaotao: nv.noiDaoTao,
-                                            //nvxeploai: nv.xepLoai,
-                                            nvdantoc: nv.iddanToc,
-                                            nvdaotao: nv.idtrinhDo,
-                                            nvquoctich: nv.quocTich,
-                                            nvcv: nv.idchucVu,
-                                            nvthuviec: nv.trangthaiHdthuViec,
-                                            nvchinhthuc: nv.trangthaiHdchinhThuc,
-                                            nvhinh: nv.hinhAnh,
-                                        })}>
-                                    </EditIcon>
-                                </Button>
-
-                                <Button>
-                                    <VisibilityIcon color="action"
-                                        onClick={() => this.setState({
-                                            showModalShow: true,
-                                            nvid: nv.idnhanVien,
-                                            nvpb: nv.idphongBan,
-                                            nvho: nv.hoDem,
-                                            nvten: nv.ten,
-                                            nvgioitinh: nv.gioiTinh,
-                                            nvsdt: nv.soDienThoai,
-                                            nvngaysinh: nv.ngaySinh.substring(0, 10),
-                                            nvtinhtranghonnhan: nv.tinhTrangHonNhan,
-                                            nvdcthuongtru: nv.diaChiThuongTru,
-                                            nvnoisinh: nv.noiSinh,
-                                            nvtongiao: nv.tonGiao,
-                                            nvchohientai: nv.choOhienTai,
-                                            nvsocmnd: nv.soCmnn,
-                                            nvngaycap: nv.ngayCap.substring(0, 10),
-                                            nvnoicap: nv.noiCap,
-                                            nvmail: nv.email,
-                                            //nvnganhhoc: nv.nganhHoc,
-                                            nvnoidaotao: nv.noiDaoTao,
-                                            //nvxeploai: nv.xepLoai,
-                                            nvdantoc: nv.iddanToc,
-                                            nvdaotao: nv.idtrinhDo,
-                                            nvquoctich: nv.quocTich,
-                                            nvcv: nv.idchucVu,
-                                            nvthuviec: nv.trangthaiHdthuViec,
-                                            nvchinhthuc: nv.trangthaiHdchinhThuc,
-                                            nvhinh: nv.hinhAnh,
-                                        })}>
-                                    </VisibilityIcon>
-                                </Button>
-
-                            </ButtonGroup>
-                            <EditNhanVienModal
-                                show={this.state.editModalShow}
-                                onHide={editModalClose}
-                                nvid={nvid}
-                                nvpb={nvpb}
-                                nvho={nvho}
-                                nvten={nvten}
-                                nvgioitinh={nvgioitinh}
-                                nvsdt={nvsdt}
-                                nvtinhtranghonnhan={nvtinhtranghonnhan}
-                                nvdcthuongtru={nvdcthuongtru}
-                                nvnoisinh={nvnoisinh}
-                                nvtongiao={nvtongiao}
-                                nvchohientai={nvchohientai}
-                                nvsocmnd={nvsocmnd}
-                                nvngaycap={nvngaycap}
-                                nvnoicap={nvnoicap}
-                                nvmail={nvmail}
-                                //nvnganhhoc={nvnganhhoc}
-                                nvnoidaotao={nvnoidaotao}
-                                //nvxeploai={nvxeploai}
-                                nvdantoc={nvdantoc}
-                                nvdaotao={nvdaotao}
-                                nvngaysinh={nvngaysinh}
-                                nvquoctich={nvquoctich}
-                                nvcv={nvcv}
-                                nvthuviec={nvthuviec}
-                                nvchinhthuc={nvchinhthuc}
-                                nvpic={nvhinh}
-                            />
-                            <ShowNhanVienModal
-                                show={this.state.showModalShow}
-                                onHide={showModalClose}
-                                nvid={nvid}
-                                nvpb={nvpb}
-                                nvho={nvho}
-                                nvten={nvten}
-                                nvgioitinh={nvgioitinh}
-                                nvsdt={nvsdt}
-                                nvtinhtranghonnhan={nvtinhtranghonnhan}
-                                nvdcthuongtru={nvdcthuongtru}
-                                nvnoisinh={nvnoisinh}
-                                nvtongiao={nvtongiao}
-                                nvchohientai={nvchohientai}
-                                nvsocmnd={nvsocmnd}
-                                nvngaycap={nvngaycap}
-                                nvnoicap={nvnoicap}
-                                nvmail={nvmail}
-                                //nvnganhhoc={nvnganhhoc}
-                                nvnoidaotao={nvnoidaotao}
-                                //nvxeploai={nvxeploai}
-                                nvdantoc={nvdantoc}
-                                nvdaotao={nvdaotao}
-                                nvngaysinh={nvngaysinh}
-                                nvquoctich={nvquoctich}
-                                nvcv={nvcv}
-                                nvthuviec={nvthuviec}
-                                nvchinhthuc={nvchinhthuc}
-                                nvpic={nvhinh}
-                            />
-                        </StyledTableCell>
-
-                    </StyledTableRow>
-                )
-            }
-            else {
-                if (nv.idphongBan == this.state.chonPB //// xem ds nv đã thôi việc mà đã xóa hđ (trang thai nv "Đã xóa hđ")
-                    && this.state.chonRadio == "Thôi việc"
-                    && nv.trangthaiHdchinhThuc == "Đã xóa hđ"
-                    && nv.trangthaiHdthuViec == "Đã xóa hđ") {
+            if (nv.username != "adminNS" && nv.username != "adminTC") {
+                if (this.state.chonRadio == "Chưa ký" // xem ds nv chưa ký hd
+                    && nv.idphongBan == this.state.chonPB
+                    //|| this.state.chonPB == '')
+                    && nv.trangthaiHdthuViec == null
+                    && nv.trangthaiHdchinhThuc == null
+                ) {
                     return (
                         <StyledTableRow >
                             {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
@@ -501,7 +515,44 @@ export class AppNhanVien extends Component {
                             <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
                             <StyledTableCell align="right">
                                 <ButtonGroup variant="text">
-                                    {this.checkBtnXoaNV(nv.idnhanVien)}
+
+                                    {this.checkBtnXoaChuaKy(nv.idnhanVien)}
+
+                                    <Button>
+                                        <EditIcon color="primary"
+                                            onClick={() => this.setState({
+                                                editModalShow: true,
+                                                nvid: nv.idnhanVien,
+                                                nvpb: nv.idphongBan,
+                                                nvho: nv.hoDem,
+                                                nvten: nv.ten,
+                                                nvgioitinh: nv.gioiTinh,
+                                                nvsdt: nv.soDienThoai,
+                                                nvngaysinh: nv.ngaySinh.substring(0, 10),
+                                                nvtinhtranghonnhan: nv.tinhTrangHonNhan,
+                                                nvdcthuongtru: nv.diaChiThuongTru,
+                                                nvnoisinh: nv.noiSinh,
+                                                nvtongiao: nv.tonGiao,
+                                                nvchohientai: nv.choOhienTai,
+                                                nvsocmnd: nv.soCmnn,
+                                                nvngaycap: nv.ngayCap.substring(0, 10),
+                                                nvnoicap: nv.noiCap,
+                                                nvmail: nv.email,
+                                                //nvnganhhoc: nv.nganhHoc,
+                                                nvnoidaotao: nv.noiDaoTao,
+                                                //nvxeploai: nv.xepLoai,
+                                                nvusername: nv.username,
+                                                nvdantoc: nv.iddanToc,
+                                                nvdaotao: nv.idtrinhDo,
+                                                nvquoctich: nv.quocTich,
+                                                nvcv: nv.idchucVu,
+                                                nvthuviec: nv.trangthaiHdthuViec,
+                                                nvchinhthuc: nv.trangthaiHdchinhThuc,
+                                                nvhinh: nv.hinhAnh,
+                                                nvqdbn: nv.idquyetDinhBn,
+                                            })}>
+                                        </EditIcon>
+                                    </Button>
 
                                     <Button>
                                         <VisibilityIcon color="action"
@@ -536,8 +587,40 @@ export class AppNhanVien extends Component {
                                             })}>
                                         </VisibilityIcon>
                                     </Button>
-                                </ButtonGroup>
 
+                                </ButtonGroup>
+                                <EditNhanVienModal
+                                    show={this.state.editModalShow}
+                                    onHide={editModalClose}
+                                    nvid={nvid}
+                                    nvpb={nvpb}
+                                    nvho={nvho}
+                                    nvten={nvten}
+                                    nvgioitinh={nvgioitinh}
+                                    nvsdt={nvsdt}
+                                    nvtinhtranghonnhan={nvtinhtranghonnhan}
+                                    nvdcthuongtru={nvdcthuongtru}
+                                    nvnoisinh={nvnoisinh}
+                                    nvtongiao={nvtongiao}
+                                    nvchohientai={nvchohientai}
+                                    nvsocmnd={nvsocmnd}
+                                    nvngaycap={nvngaycap}
+                                    nvnoicap={nvnoicap}
+                                    nvmail={nvmail}
+                                    //nvnganhhoc={nvnganhhoc}
+                                    nvnoidaotao={nvnoidaotao}
+                                    //nvxeploai={nvxeploai}
+                                    nvusername={nvusername}
+                                    nvdantoc={nvdantoc}
+                                    nvdaotao={nvdaotao}
+                                    nvngaysinh={nvngaysinh}
+                                    nvquoctich={nvquoctich}
+                                    nvcv={nvcv}
+                                    nvthuviec={nvthuviec}
+                                    nvchinhthuc={nvchinhthuc}
+                                    nvpic={nvhinh}
+                                    nvqdbn={nvqdbn}
+                                />
                                 <ShowNhanVienModal
                                     show={this.state.showModalShow}
                                     onHide={showModalClose}
@@ -569,20 +652,16 @@ export class AppNhanVien extends Component {
                                     nvpic={nvhinh}
                                 />
                             </StyledTableCell>
+
                         </StyledTableRow>
                     )
                 }
-                else {
-
-                }
-                return hopdongs.map(hd => { // Đã ký hd rồi thì k thể xóa nv mà chỉ được Hủy hợp đồng
+                /*================================================================================================*/
+                else {//// xem ds nv đã thôi việc mà đã xóa hđ (trang thai nv "Đã xóa hđ")
                     if (nv.idphongBan == this.state.chonPB
-                        //|| this.state.chonPB == '')
-                        && this.state.chonRadio == "Đã ký"
-                        && nv.idnhanVien == hd.idnhanVien
-                        && hd.ghiChu == "Ký"
-
-                    ) {
+                        && this.state.chonRadio == "Thôi việc"
+                        && nv.trangthaiHdchinhThuc == "Đã xóa hđ"
+                        && nv.trangthaiHdthuViec == "Đã xóa hđ") {
                         return (
                             <StyledTableRow >
                                 {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
@@ -594,41 +673,7 @@ export class AppNhanVien extends Component {
                                 <StyledTableCell align="right">
                                     <ButtonGroup variant="text">
 
-                                        {/* {this.checkBtnXoaChuaKy(nv.idnhanVien)} */}
-
-                                        <Button>
-                                            <EditIcon color="primary"
-                                                onClick={() => this.setState({
-                                                    editModalShow: true,
-                                                    nvid: nv.idnhanVien,
-                                                    nvpb: nv.idphongBan,
-                                                    nvho: nv.hoDem,
-                                                    nvten: nv.ten,
-                                                    nvgioitinh: nv.gioiTinh,
-                                                    nvsdt: nv.soDienThoai,
-                                                    nvngaysinh: nv.ngaySinh.substring(0, 10),
-                                                    nvtinhtranghonnhan: nv.tinhTrangHonNhan,
-                                                    nvdcthuongtru: nv.diaChiThuongTru,
-                                                    nvnoisinh: nv.noiSinh,
-                                                    nvtongiao: nv.tonGiao,
-                                                    nvchohientai: nv.choOhienTai,
-                                                    nvsocmnd: nv.soCmnn,
-                                                    nvngaycap: nv.ngayCap.substring(0, 10),
-                                                    nvnoicap: nv.noiCap,
-                                                    nvmail: nv.email,
-                                                    //nvnganhhoc: nv.nganhHoc,
-                                                    nvnoidaotao: nv.noiDaoTao,
-                                                    //nvxeploai: nv.xepLoai,
-                                                    nvdantoc: nv.iddanToc,
-                                                    nvdaotao: nv.idtrinhDo,
-                                                    nvquoctich: nv.quocTich,
-                                                    nvcv: nv.idchucVu,
-                                                    nvthuviec: nv.trangthaiHdthuViec,
-                                                    nvchinhthuc: nv.trangthaiHdchinhThuc,
-                                                    nvhinh: nv.hinhAnh,
-                                                })}>
-                                            </EditIcon>
-                                        </Button>
+                                        {/* {this.checkBtnXoaNV(nv.idnhanVien)} */} 
 
                                         <Button>
                                             <VisibilityIcon color="action"
@@ -663,96 +708,8 @@ export class AppNhanVien extends Component {
                                                 })}>
                                             </VisibilityIcon>
                                         </Button>
-
-                                        <Button>
-                                            <PrintIcon color="inherit"
-                                                onClick={() => this.setState({
-                                                    inModalShow: true,
-                                                    nvid: nv.idnhanVien,
-                                                    nvpb: nv.idphongBan,
-                                                    nvho: nv.hoDem,
-                                                    nvten: nv.ten,
-                                                    nvgioitinh: nv.gioiTinh,
-                                                    nvsdt: nv.soDienThoai,
-                                                    nvngaysinh: nv.ngaySinh.substring(0, 10),
-                                                    nvtinhtranghonnhan: nv.tinhTrangHonNhan,
-                                                    nvdcthuongtru: nv.diaChiThuongTru,
-                                                    nvnoisinh: nv.noiSinh,
-                                                    nvtongiao: nv.tonGiao,
-                                                    nvchohientai: nv.choOhienTai,
-                                                    nvsocmnd: nv.soCmnn,
-                                                    nvngaycap: nv.ngayCap.substring(0, 10),
-                                                    nvnoicap: nv.noiCap,
-                                                    nvmail: nv.email,
-                                                    // nvnganhhoc: nv.nganhHoc,
-                                                    nvnoidaotao: nv.noiDaoTao,
-                                                    // nvxeploai: nv.xepLoai,
-                                                    nvdantoc: nv.iddanToc,
-                                                    nvdaotao: nv.idtrinhDo,
-                                                    nvquoctich: nv.quocTich,
-                                                    nvcv: nv.idchucVu,
-                                                })}
-                                            >
-                                            </PrintIcon>
-                                        </Button>
-
                                     </ButtonGroup>
-                                    <InNhanVienModal
-                                        show={this.state.inModalShow}
-                                        onHide={inModalClose}
-                                        nvid={nvid}
-                                        nvpb={nvpb}
-                                        nvho={nvho}
-                                        nvten={nvten}
-                                        nvgioitinh={nvgioitinh}
-                                        nvsdt={nvsdt}
-                                        nvtinhtranghonnhan={nvtinhtranghonnhan}
-                                        nvdcthuongtru={nvdcthuongtru}
-                                        nvnoisinh={nvnoisinh}
-                                        nvtongiao={nvtongiao}
-                                        nvchohientai={nvchohientai}
-                                        nvsocmnd={nvsocmnd}
-                                        nvngaycap={nvngaycap}
-                                        nvnoicap={nvnoicap}
-                                        nvmail={nvmail}
-                                        // nvnganhhoc={nvnganhhoc}
-                                        nvnoidaotao={nvnoidaotao}
-                                        // nvxeploai={nvxeploai}
-                                        nvdantoc={nvdantoc}
-                                        nvdaotao={nvdaotao}
-                                        nvngaysinh={nvngaysinh}
-                                        nvquoctich={nvquoctich}
-                                    />
-                                    <EditNhanVienModal
-                                        show={this.state.editModalShow}
-                                        onHide={editModalClose}
-                                        nvid={nvid}
-                                        nvpb={nvpb}
-                                        nvho={nvho}
-                                        nvten={nvten}
-                                        nvgioitinh={nvgioitinh}
-                                        nvsdt={nvsdt}
-                                        nvtinhtranghonnhan={nvtinhtranghonnhan}
-                                        nvdcthuongtru={nvdcthuongtru}
-                                        nvnoisinh={nvnoisinh}
-                                        nvtongiao={nvtongiao}
-                                        nvchohientai={nvchohientai}
-                                        nvsocmnd={nvsocmnd}
-                                        nvngaycap={nvngaycap}
-                                        nvnoicap={nvnoicap}
-                                        nvmail={nvmail}
-                                        //nvnganhhoc={nvnganhhoc}
-                                        nvnoidaotao={nvnoidaotao}
-                                        //nvxeploai={nvxeploai}
-                                        nvdantoc={nvdantoc}
-                                        nvdaotao={nvdaotao}
-                                        nvngaysinh={nvngaysinh}
-                                        nvquoctich={nvquoctich}
-                                        nvcv={nvcv}
-                                        nvthuviec={nvthuviec}
-                                        nvchinhthuc={nvchinhthuc}
-                                        nvpic={nvhinh}
-                                    />
+
                                     <ShowNhanVienModal
                                         show={this.state.showModalShow}
                                         onHide={showModalClose}
@@ -784,104 +741,322 @@ export class AppNhanVien extends Component {
                                         nvpic={nvhinh}
                                     />
                                 </StyledTableCell>
-
                             </StyledTableRow>
                         )
                     }
+                    /*================================================================================================*/
                     else {
-                        if (nv.idphongBan == this.state.chonPB //// xem ds nv đã thôi việc
-                            && this.state.chonRadio == "Thôi việc"
-                            && nv.idnhanVien == hd.idnhanVien
-                            && hd.ghiChu == "Hủy"
-                        ) {
-                            return (
-                                <StyledTableRow >
-                                    {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
-                                    <StyledTableCell>{nv.hoDem}</StyledTableCell>
-                                    <StyledTableCell>{nv.ten}</StyledTableCell>
-                                    <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
-                                    <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
-                                    <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
-                                    <StyledTableCell align="right">
-                                        <ButtonGroup variant="text">
+                        return hopdongs.map(hd => { // Đã ký hd rồi thì k thể xóa nv mà chỉ được Hủy hợp đồng
+                            if (nv.idphongBan == this.state.chonPB
+                                //|| this.state.chonPB == '')
+                                && this.state.chonRadio == "Đã ký"
+                                && nv.idnhanVien == hd.idnhanVien
+                                && hd.ghiChu == "Ký"
+                            ) {
+                                return (
+                                    <StyledTableRow >
+                                        {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
+                                        <StyledTableCell>{nv.hoDem}</StyledTableCell>
+                                        <StyledTableCell>{nv.ten}</StyledTableCell>
+                                        <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
+                                        <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
+                                        <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
+                                        <StyledTableCell align="right">
+                                            <ButtonGroup variant="text">
 
-                                            {/* {this.checkBtnXoaNV(nv.idnhanVien)} */}
+                                                {this.checkBtnKey(nv.idnhanVien)}
+                                                
+                                                <Button>
+                                                    <EditIcon color="primary"
+                                                        onClick={() => this.setState({
+                                                            editModalShow: true,
+                                                            nvid: nv.idnhanVien,
+                                                            nvpb: nv.idphongBan,
+                                                            nvho: nv.hoDem,
+                                                            nvten: nv.ten,
+                                                            nvgioitinh: nv.gioiTinh,
+                                                            nvsdt: nv.soDienThoai,
+                                                            nvngaysinh: nv.ngaySinh.substring(0, 10),
+                                                            nvtinhtranghonnhan: nv.tinhTrangHonNhan,
+                                                            nvdcthuongtru: nv.diaChiThuongTru,
+                                                            nvnoisinh: nv.noiSinh,
+                                                            nvtongiao: nv.tonGiao,
+                                                            nvchohientai: nv.choOhienTai,
+                                                            nvsocmnd: nv.soCmnn,
+                                                            nvngaycap: nv.ngayCap.substring(0, 10),
+                                                            nvnoicap: nv.noiCap,
+                                                            nvmail: nv.email,
+                                                            //nvnganhhoc: nv.nganhHoc,
+                                                            nvnoidaotao: nv.noiDaoTao,
+                                                            //nvxeploai: nv.xepLoai,
+                                                            nvusername: nv.username,
+                                                            nvdantoc: nv.iddanToc,
+                                                            nvdaotao: nv.idtrinhDo,
+                                                            nvquoctich: nv.quocTich,
+                                                            nvcv: nv.idchucVu,
+                                                            nvthuviec: nv.trangthaiHdthuViec,
+                                                            nvchinhthuc: nv.trangthaiHdchinhThuc,
+                                                            nvhinh: nv.hinhAnh,
+                                                            nvqdbn: nv.idquyetDinhBn,
+                                                        })}>
+                                                    </EditIcon>
+                                                </Button>
 
-                                            <Button>
-                                                <VisibilityIcon color="action"
-                                                    onClick={() => this.setState({
-                                                        showModalShow: true,
-                                                        nvid: nv.idnhanVien,
-                                                        nvpb: nv.idphongBan,
-                                                        nvho: nv.hoDem,
-                                                        nvten: nv.ten,
-                                                        nvgioitinh: nv.gioiTinh,
-                                                        nvsdt: nv.soDienThoai,
-                                                        nvngaysinh: nv.ngaySinh.substring(0, 10),
-                                                        nvtinhtranghonnhan: nv.tinhTrangHonNhan,
-                                                        nvdcthuongtru: nv.diaChiThuongTru,
-                                                        nvnoisinh: nv.noiSinh,
-                                                        nvtongiao: nv.tonGiao,
-                                                        nvchohientai: nv.choOhienTai,
-                                                        nvsocmnd: nv.soCmnn,
-                                                        nvngaycap: nv.ngayCap.substring(0, 10),
-                                                        nvnoicap: nv.noiCap,
-                                                        nvmail: nv.email,
-                                                        //nvnganhhoc: nv.nganhHoc,
-                                                        nvnoidaotao: nv.noiDaoTao,
-                                                        //nvxeploai: nv.xepLoai,
-                                                        nvdantoc: nv.iddanToc,
-                                                        nvdaotao: nv.idtrinhDo,
-                                                        nvquoctich: nv.quocTich,
-                                                        nvcv: nv.idchucVu,
-                                                        nvthuviec: nv.trangthaiHdthuViec,
-                                                        nvchinhthuc: nv.trangthaiHdchinhThuc,
-                                                        nvhinh: nv.hinhAnh,
-                                                    })}>
-                                                </VisibilityIcon>
-                                            </Button>
+                                                <Button>
+                                                    <VisibilityIcon color="action"
+                                                        onClick={() => this.setState({
+                                                            showModalShow: true,
+                                                            nvid: nv.idnhanVien,
+                                                            nvpb: nv.idphongBan,
+                                                            nvho: nv.hoDem,
+                                                            nvten: nv.ten,
+                                                            nvgioitinh: nv.gioiTinh,
+                                                            nvsdt: nv.soDienThoai,
+                                                            nvngaysinh: nv.ngaySinh.substring(0, 10),
+                                                            nvtinhtranghonnhan: nv.tinhTrangHonNhan,
+                                                            nvdcthuongtru: nv.diaChiThuongTru,
+                                                            nvnoisinh: nv.noiSinh,
+                                                            nvtongiao: nv.tonGiao,
+                                                            nvchohientai: nv.choOhienTai,
+                                                            nvsocmnd: nv.soCmnn,
+                                                            nvngaycap: nv.ngayCap.substring(0, 10),
+                                                            nvnoicap: nv.noiCap,
+                                                            nvmail: nv.email,
+                                                            //nvnganhhoc: nv.nganhHoc,
+                                                            nvnoidaotao: nv.noiDaoTao,
+                                                            //nvxeploai: nv.xepLoai,
+                                                            nvdantoc: nv.iddanToc,
+                                                            nvdaotao: nv.idtrinhDo,
+                                                            nvquoctich: nv.quocTich,
+                                                            nvcv: nv.idchucVu,
+                                                            nvthuviec: nv.trangthaiHdthuViec,
+                                                            nvchinhthuc: nv.trangthaiHdchinhThuc,
+                                                            nvhinh: nv.hinhAnh,
+                                                        })}>
+                                                    </VisibilityIcon>
+                                                </Button>
 
-                                        </ButtonGroup>
+                                                <Button>
+                                                    <PrintIcon color="inherit"
+                                                        onClick={() => this.setState({
+                                                            inModalShow: true,
+                                                            nvid: nv.idnhanVien,
+                                                            nvpb: nv.idphongBan,
+                                                            nvho: nv.hoDem,
+                                                            nvten: nv.ten,
+                                                            nvgioitinh: nv.gioiTinh,
+                                                            nvsdt: nv.soDienThoai,
+                                                            nvngaysinh: nv.ngaySinh.substring(0, 10),
+                                                            nvtinhtranghonnhan: nv.tinhTrangHonNhan,
+                                                            nvdcthuongtru: nv.diaChiThuongTru,
+                                                            nvnoisinh: nv.noiSinh,
+                                                            nvtongiao: nv.tonGiao,
+                                                            nvchohientai: nv.choOhienTai,
+                                                            nvsocmnd: nv.soCmnn,
+                                                            nvngaycap: nv.ngayCap.substring(0, 10),
+                                                            nvnoicap: nv.noiCap,
+                                                            nvmail: nv.email,
+                                                            // nvnganhhoc: nv.nganhHoc,
+                                                            nvnoidaotao: nv.noiDaoTao,
+                                                            // nvxeploai: nv.xepLoai,
+                                                            nvdantoc: nv.iddanToc,
+                                                            nvdaotao: nv.idtrinhDo,
+                                                            nvquoctich: nv.quocTich,
+                                                            nvcv: nv.idchucVu,
+                                                        })}
+                                                    >
+                                                    </PrintIcon>
+                                                </Button>
 
-                                        <ShowNhanVienModal
-                                            show={this.state.showModalShow}
-                                            onHide={showModalClose}
-                                            nvid={nvid}
-                                            nvpb={nvpb}
-                                            nvho={nvho}
-                                            nvten={nvten}
-                                            nvgioitinh={nvgioitinh}
-                                            nvsdt={nvsdt}
-                                            nvtinhtranghonnhan={nvtinhtranghonnhan}
-                                            nvdcthuongtru={nvdcthuongtru}
-                                            nvnoisinh={nvnoisinh}
-                                            nvtongiao={nvtongiao}
-                                            nvchohientai={nvchohientai}
-                                            nvsocmnd={nvsocmnd}
-                                            nvngaycap={nvngaycap}
-                                            nvnoicap={nvnoicap}
-                                            nvmail={nvmail}
-                                            //nvnganhhoc={nvnganhhoc}
-                                            nvnoidaotao={nvnoidaotao}
-                                            //nvxeploai={nvxeploai}
-                                            nvdantoc={nvdantoc}
-                                            nvdaotao={nvdaotao}
-                                            nvngaysinh={nvngaysinh}
-                                            nvquoctich={nvquoctich}
-                                            nvcv={nvcv}
-                                            nvthuviec={nvthuviec}
-                                            nvchinhthuc={nvchinhthuc}
-                                            nvpic={nvhinh}
-                                        />
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            )
-                        }
+                                            </ButtonGroup>
+                                            <InNhanVienModal
+                                                show={this.state.inModalShow}
+                                                onHide={inModalClose}
+                                                nvid={nvid}
+                                                nvpb={nvpb}
+                                                nvho={nvho}
+                                                nvten={nvten}
+                                                nvgioitinh={nvgioitinh}
+                                                nvsdt={nvsdt}
+                                                nvtinhtranghonnhan={nvtinhtranghonnhan}
+                                                nvdcthuongtru={nvdcthuongtru}
+                                                nvnoisinh={nvnoisinh}
+                                                nvtongiao={nvtongiao}
+                                                nvchohientai={nvchohientai}
+                                                nvsocmnd={nvsocmnd}
+                                                nvngaycap={nvngaycap}
+                                                nvnoicap={nvnoicap}
+                                                nvmail={nvmail}
+                                                // nvnganhhoc={nvnganhhoc}
+                                                nvnoidaotao={nvnoidaotao}
+                                                // nvxeploai={nvxeploai}
+                                                nvdantoc={nvdantoc}
+                                                nvdaotao={nvdaotao}
+                                                nvngaysinh={nvngaysinh}
+                                                nvquoctich={nvquoctich}
+                                            />
+                                            <EditNhanVienModal
+                                                show={this.state.editModalShow}
+                                                onHide={editModalClose}
+                                                nvid={nvid}
+                                                nvpb={nvpb}
+                                                nvho={nvho}
+                                                nvten={nvten}
+                                                nvgioitinh={nvgioitinh}
+                                                nvsdt={nvsdt}
+                                                nvtinhtranghonnhan={nvtinhtranghonnhan}
+                                                nvdcthuongtru={nvdcthuongtru}
+                                                nvnoisinh={nvnoisinh}
+                                                nvtongiao={nvtongiao}
+                                                nvchohientai={nvchohientai}
+                                                nvsocmnd={nvsocmnd}
+                                                nvngaycap={nvngaycap}
+                                                nvnoicap={nvnoicap}
+                                                nvmail={nvmail}
+                                                //nvnganhhoc={nvnganhhoc}
+                                                nvnoidaotao={nvnoidaotao}
+                                                //nvxeploai={nvxeploai}
+                                                nvusername={nvusername}
+                                                nvdantoc={nvdantoc}
+                                                nvdaotao={nvdaotao}
+                                                nvngaysinh={nvngaysinh}
+                                                nvquoctich={nvquoctich}
+                                                nvcv={nvcv}
+                                                nvthuviec={nvthuviec}
+                                                nvchinhthuc={nvchinhthuc}
+                                                nvpic={nvhinh}
+                                                nvqdbn={nvqdbn}
+                                            />
+                                            <ShowNhanVienModal
+                                                show={this.state.showModalShow}
+                                                onHide={showModalClose}
+                                                nvid={nvid}
+                                                nvpb={nvpb}
+                                                nvho={nvho}
+                                                nvten={nvten}
+                                                nvgioitinh={nvgioitinh}
+                                                nvsdt={nvsdt}
+                                                nvtinhtranghonnhan={nvtinhtranghonnhan}
+                                                nvdcthuongtru={nvdcthuongtru}
+                                                nvnoisinh={nvnoisinh}
+                                                nvtongiao={nvtongiao}
+                                                nvchohientai={nvchohientai}
+                                                nvsocmnd={nvsocmnd}
+                                                nvngaycap={nvngaycap}
+                                                nvnoicap={nvnoicap}
+                                                nvmail={nvmail}
+                                                //nvnganhhoc={nvnganhhoc}
+                                                nvnoidaotao={nvnoidaotao}
+                                                //nvxeploai={nvxeploai}
+                                                nvdantoc={nvdantoc}
+                                                nvdaotao={nvdaotao}
+                                                nvngaysinh={nvngaysinh}
+                                                nvquoctich={nvquoctich}
+                                                nvcv={nvcv}
+                                                nvthuviec={nvthuviec}
+                                                nvchinhthuc={nvchinhthuc}
+                                                nvpic={nvhinh}
+                                            />
+                                        </StyledTableCell>
+
+                                    </StyledTableRow>
+                                )
+                            }
+                            /*================================================================================================*/
+                            else {
+                                if (nv.idphongBan == this.state.chonPB //// xem ds nv đã thôi việc
+                                    && this.state.chonRadio == "Thôi việc"
+                                    && nv.idnhanVien == hd.idnhanVien
+                                    && hd.ghiChu == "Hủy"
+                                ) {
+                                    return (
+                                        <StyledTableRow >
+                                            {/* <StyledTableCell>{key + 1}</StyledTableCell> */}
+                                            <StyledTableCell>{nv.hoDem}</StyledTableCell>
+                                            <StyledTableCell>{nv.ten}</StyledTableCell>
+                                            <StyledTableCell align="center">{nv.gioiTinh}</StyledTableCell>
+                                            <StyledTableCell align="center">{nv.soDienThoai}</StyledTableCell>
+                                            <StyledTableCell align="center">{this.layTenPB(nv.idphongBan)}</StyledTableCell>
+                                            <StyledTableCell align="right">
+                                                <ButtonGroup variant="text">
+
+                                                    {/* {this.checkBtnXoaNV(nv.idnhanVien)} */}
+
+                                                    <Button>
+                                                        <VisibilityIcon color="action"
+                                                            onClick={() => this.setState({
+                                                                showModalShow: true,
+                                                                nvid: nv.idnhanVien,
+                                                                nvpb: nv.idphongBan,
+                                                                nvho: nv.hoDem,
+                                                                nvten: nv.ten,
+                                                                nvgioitinh: nv.gioiTinh,
+                                                                nvsdt: nv.soDienThoai,
+                                                                nvngaysinh: nv.ngaySinh.substring(0, 10),
+                                                                nvtinhtranghonnhan: nv.tinhTrangHonNhan,
+                                                                nvdcthuongtru: nv.diaChiThuongTru,
+                                                                nvnoisinh: nv.noiSinh,
+                                                                nvtongiao: nv.tonGiao,
+                                                                nvchohientai: nv.choOhienTai,
+                                                                nvsocmnd: nv.soCmnn,
+                                                                nvngaycap: nv.ngayCap.substring(0, 10),
+                                                                nvnoicap: nv.noiCap,
+                                                                nvmail: nv.email,
+                                                                //nvnganhhoc: nv.nganhHoc,
+                                                                nvnoidaotao: nv.noiDaoTao,
+                                                                //nvxeploai: nv.xepLoai,
+                                                                nvdantoc: nv.iddanToc,
+                                                                nvdaotao: nv.idtrinhDo,
+                                                                nvquoctich: nv.quocTich,
+                                                                nvcv: nv.idchucVu,
+                                                                nvthuviec: nv.trangthaiHdthuViec,
+                                                                nvchinhthuc: nv.trangthaiHdchinhThuc,
+                                                                nvhinh: nv.hinhAnh,
+                                                            })}>
+                                                        </VisibilityIcon>
+                                                    </Button>
+
+                                                </ButtonGroup>
+
+                                                <ShowNhanVienModal
+                                                    show={this.state.showModalShow}
+                                                    onHide={showModalClose}
+                                                    nvid={nvid}
+                                                    nvpb={nvpb}
+                                                    nvho={nvho}
+                                                    nvten={nvten}
+                                                    nvgioitinh={nvgioitinh}
+                                                    nvsdt={nvsdt}
+                                                    nvtinhtranghonnhan={nvtinhtranghonnhan}
+                                                    nvdcthuongtru={nvdcthuongtru}
+                                                    nvnoisinh={nvnoisinh}
+                                                    nvtongiao={nvtongiao}
+                                                    nvchohientai={nvchohientai}
+                                                    nvsocmnd={nvsocmnd}
+                                                    nvngaycap={nvngaycap}
+                                                    nvnoicap={nvnoicap}
+                                                    nvmail={nvmail}
+                                                    //nvnganhhoc={nvnganhhoc}
+                                                    nvnoidaotao={nvnoidaotao}
+                                                    //nvxeploai={nvxeploai}
+                                                    nvdantoc={nvdantoc}
+                                                    nvdaotao={nvdaotao}
+                                                    nvngaysinh={nvngaysinh}
+                                                    nvquoctich={nvquoctich}
+                                                    nvcv={nvcv}
+                                                    nvthuviec={nvthuviec}
+                                                    nvchinhthuc={nvchinhthuc}
+                                                    nvpic={nvhinh}
+                                                />
+                                            </StyledTableCell>
+                                        </StyledTableRow>
+                                    )
+                                }
+                            }
+                        })
                     }
-                })
+                }
             }
-
-
         })
     }
 
@@ -896,7 +1071,6 @@ export class AppNhanVien extends Component {
                     <Col sm={4}>
                         <label>Xem danh sách nhân viên </label>
                         <RadioGroup
-                            //name="gender1"
                             value={this.state.chonRadio}
                             onChange={this.handleChangeCheck}
                         >

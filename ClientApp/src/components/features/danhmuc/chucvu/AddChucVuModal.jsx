@@ -30,6 +30,7 @@ export class AddChucVuModal extends Component {
             body: JSON.stringify({
                 //id : null,
                 tenChucVu: event.target.ChucvuTEN.value,
+                heSoChucVu: event.target.ChucvuHESO.value,
                 moTa: event.target.ChucvuMOTA.value
             })
         })
@@ -78,6 +79,15 @@ export class AddChucVuModal extends Component {
                                         <Form.Control
                                             type="text"
                                             name="ChucvuTEN"
+                                            required
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group controlId="ChucvuHESO">
+                                        <Form.Label>Hệ số chức vụ</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="ChucvuHESO"
                                             required
                                         />
                                     </Form.Group>

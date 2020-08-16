@@ -5,6 +5,8 @@ import { withStyles } from '@material-ui/core/styles';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AppCSS from '../../../../AppCSS.css'
+import { getMonth, getYear } from 'date-fns'
+
 
 import { format} from 'date-fns';
 import axios from 'axios';
@@ -44,6 +46,7 @@ export class AddChamCongThuCong extends Component {
         super(props);
 
         this.state = {
+            bangluongs:[],
             cvs: [],
             pbs: [],
             nhanviens: [],
@@ -66,6 +69,16 @@ export class AddChamCongThuCong extends Component {
         this.loadNV()
         this.loadPhongBan()
         this.loadChucVu()
+        this.loadBangLuong()
+    }
+
+    loadBangLuong() {
+        fetch('https://localhost:44390/api/bangluongs')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ bangluongs: data });
+            });
+
     }
 
     loadPhongBan() {
@@ -144,23 +157,53 @@ export class AddChamCongThuCong extends Component {
                 co = true
             }
         }
-        if (co) {
-            alert("Ngày này đã chấm công")
-        } else {
-            axios.post('https://localhost:44390/api/chamcongs', {
-                ngayChamCong: event.target.ChamCongNgay.value,
-                idnhanVien: parseInt(this.props.idnv),
-                gioVao: event.target.ChamCongGioVao.value,
-                gioRa: event.target.ChamCongGioRa.value,
-                //ghiChu: event.target.ChamCongGhiChu.value,
 
-            })
-                .then(response => {
-                    //console.log(response)
-                    this.setState({ chamcongs: response.data })
-                    alert("Chấm công bổ sung thành công")
-                })
+        var layThangCC = getMonth(new Date(event.target.ChamCongNgay.value)) + 1
+        var layNamCC = getYear(new Date(event.target.ChamCongNgay.value))
+        // console.log(event.target.QUYETDINHngayhethieuluc.value);
+        // console.log(layThangQD);
+        // console.log(layNamQD);
+
+        let flag = false
+        // kiểm tra đã đỗ dữ liệu hay chưa
+        // nếu đỗ rồi sẽ không được xóa qdKT
+        for (let i = 0; i < this.state.bangluongs.length; i++) {
+            for (let j = 0; j < this.state.chamcongs.length; j++) {
+                if (this.state.bangluongs[i].thang == layThangCC
+                    && this.state.bangluongs[i].nam == layNamCC
+                    //&& this.state.bangluongs[i].idnhanVien == this.state.quyetdinhkts[j].idnhanVien
+                ) {
+                    flag = true
+                }
+                else {
+                    flag = false
+                }
+            }
         }
+        if (flag) {
+            alert("Đã đỗ dữ liệu của tháng này. Không thể chấm công nữa!!!")
+        }
+        else{
+            if (co) {
+                alert("Ngày này đã chấm công")
+            } else {
+                axios.post('https://localhost:44390/api/chamcongs', {
+                    ngayChamCong: event.target.ChamCongNgay.value,
+                    idnhanVien: parseInt(this.props.idnv),
+                    gioVao: event.target.ChamCongGioVao.value,
+                    gioRa: event.target.ChamCongGioRa.value,
+                    //ghiChu: event.target.ChamCongGhiChu.value,
+    
+                })
+                    .then(response => {
+                        //console.log(response)
+                        this.setState({ chamcongs: response.data })
+                        alert("Chấm công bổ sung thành công")
+                    })
+            }
+        }
+
+        
 
     }
 
