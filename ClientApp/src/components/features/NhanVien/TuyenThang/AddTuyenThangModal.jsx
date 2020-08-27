@@ -175,6 +175,7 @@ export class AddTuyenThangModal extends Component {
         event.preventDefault();
 
         var ngayHienTai = format(new Date(), 'yyyy-MM-dd')
+        var ngayHienTaiDOB = format(new Date(), 'yyyy-MM-dd')
         //2020-08-01 vs 1998-09-10 => 21 tuổi
         var tinhTuoi = differenceInYears(
             new Date(ngayHienTai),
@@ -189,6 +190,9 @@ export class AddTuyenThangModal extends Component {
         //Nếu ngày cấp CMND trước Ngày hiện tại => -1 (bằng là 0)
         var ktNgayCapVsNgayHienTai = compareAsc(new Date(event.target.NhanvienNgNgayCapCMMM.value),
             new Date(ngayHienTai)) //console.log(ktNgayCapVsNgayHienTai)
+
+        var ktNgaySinhVsNgayHienTai = compareAsc(new Date(event.target.NhanvienNgaySinh.value),
+            new Date(ngayHienTaiDOB)) //console.log(ktNgayCapVsNgayHienTai)
 
         //Kt trùng số CMND
         let flagSoCMND = false
@@ -216,88 +220,96 @@ export class AddTuyenThangModal extends Component {
         //// add
         let flagTuoi = true
         let flagNgayCapCMND = true
-        if (tinhTuoi < 18) { // chưa đủ tuổi đi làm
+        if (tinhTuoi < 18 || ktNgaySinhVsNgayHienTai == 1) { // chưa đủ tuổi đi làm
             flagTuoi = false
-            alert("Ngày sinh chưa hợp lệ. YÊU CẦU ỨNG VIÊN PHẢI TRÊN 18 Tuổi!!!")
+            //alert("Ngày sinh chưa hợp lệ. YÊU CẦU NHÂN VIÊN PHẢI TRÊN 18 Tuổi!!!")
+            this.setState({ snackbaropen: true, snackbarmsg: "Ngày sinh chưa hợp lệ" });
         } else {
             if (tinhNgayCapCMND < 14 || ktNgayCapVsNgayHienTai == 1) { // chưa đủ 14 tuổi & ngày cấp sau hiện tại 
                 flagNgayCapCMND = false
-                alert("Ngày cấp CMND chưa hợp lệ")
+                //alert("Ngày cấp CMND chưa hợp lệ")
+                this.setState({ snackbaropen: true, snackbarmsg: "Ngày cấp CMND chưa hợp lệ" });
             }
             else {
                 if (flagSoCMND == true) {
-                    alert("Số CMND đã bị trùng")
+                    //alert("Số CMND đã bị trùng")
+                    this.setState({ snackbaropen: true, snackbarmsg: "Số CMND đã bị trùng" });
                 }
                 // else {
                 //     if (flagTruongPhong == true
                 //     ) {
                 //         alert("Phòng ban này đã có trưởng phòng")
                 //     }
-                    else {
-                        if ((flagTuoi == true && flagNgayCapCMND == true)
-                            && this.state.formErrors.NhanvienTEN == "." // thỏa tất cả mới đc submit
-                            && this.state.formErrors.NhanvienHO == "." // nếu không đỏ sẽ post đc
-                            && this.state.formErrors.NhanvienEmail == "."
-                            && this.state.formErrors.NhanvienSoCMNN == "."
-                            && this.state.formErrors.NhanvienSDT == "."
+                else {
+                    if ((flagTuoi == true && flagNgayCapCMND == true)
+                        && this.state.formErrors.NhanvienTEN == "." // thỏa tất cả mới đc submit
+                        && this.state.formErrors.NhanvienHO == "." // nếu không đỏ sẽ post đc
+                        && this.state.formErrors.NhanvienEmail == "."
+                        && this.state.formErrors.NhanvienSoCMNN == "."
+                        && this.state.formErrors.NhanvienSDT == "."
 
-                            && event.target.NhanvienTEN.value != "" // gõ đúng hết sau đó nhấn đóng
-                            && event.target.NhanvienHO.value != ""
-                            && event.target.NhanvienEmail.value != ""
-                            && event.target.NhanvienSoCMNN.value != ""
-                            && event.target.NhanvienSDT.value != ""
+                        && event.target.NhanvienTEN.value != "" // gõ đúng hết sau đó nhấn đóng
+                        && event.target.NhanvienHO.value != ""
+                        && event.target.NhanvienEmail.value != ""
+                        && event.target.NhanvienSoCMNN.value != ""
+                        && event.target.NhanvienSDT.value != ""
 
-                            && event.target.NhanvienTonGiao.value != ""
-                            && event.target.NhanvienNoiSinh.value != ""
-                            && event.target.NhanvienNoiCap.value != ""
-                            && event.target.NhanvienQuocTich.value != ""
-                            && event.target.NhanvienDiaChi.value != ""
-                            && event.target.NhanvienChoOHienTai.value != ""
-                            && event.target.NhanvienTinhTrangHonNhan.value != ""
+                        && event.target.NhanvienTonGiao.value != ""
+                        && event.target.NhanvienNoiSinh.value != ""
+                        && event.target.NhanvienNoiCap.value != ""
+                        && event.target.NhanvienQuocTich.value != ""
+                        && event.target.NhanvienDiaChi.value != ""
+                        && event.target.NhanvienChoOHienTai.value != ""
+                        && event.target.NhanvienTinhTrangHonNhan.value != ""
 
-                            && event.target.NhanvienNgaySinh.value != ""
-                            && event.target.NhanvienNgNgayCapCMMM.value != ""
-                        ) {
-                            axios.post('https://localhost:44390/api/nhanviens/', {
-                                //id : null,
-                                hoDem: event.target.NhanvienHO.value,
-                                ten: event.target.NhanvienTEN.value,
-                                //nguyenQuan: event.target.NhanvienNguyenQuan.value,
-                                tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
-                                ngaySinh: event.target.NhanvienNgaySinh.value,
-                                noiSinh: event.target.NhanvienNoiSinh.value,
-                                gioiTinh: event.target.NhanvienGIOITINH.value,
-                                hinhanh: this.state.url,
-                                diaChiThuongTru: event.target.NhanvienDiaChi.value,
-                                choOhienTai: event.target.NhanvienChoOHienTai.value,
-                                soCmnn: event.target.NhanvienSoCMNN.value,
-                                ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
-                                tonGiao: event.target.NhanvienTonGiao.value,
-                                noiCap: event.target.NhanvienNoiCap.value,
-                                quocTich: event.target.NhanvienQuocTich.value,
-                                email: event.target.NhanvienEmail.value,
-                                soDienThoai: event.target.NhanvienSDT.value,
-                                nganhHoc: null,
-                                noiDaoTao: null,
-                                //xepLoai: event.target.NhanvienXepLoai.value,
-                                //username
-                                idphongBan: parseInt(event.target.NhanvienPB.value),
-                                idchucVu: parseInt(event.target.NhanvienCV.value),
-                                //idquanHeGd
-                                ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
-                                trangthaiHdthuViec: null,
-                                trangthaiHdchinhThuc: null,
-                                iddanToc: parseInt(event.target.NhanvienDanToc.value),
-                                idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
-                                //idquyetDinhBn
+                        && event.target.NhanvienNgaySinh.value != ""
+                        && event.target.NhanvienNgNgayCapCMMM.value != ""
+                    ) {
+                        axios.post('https://localhost:44390/api/nhanviens/', {
+                            //id : null,
+                            hoDem: event.target.NhanvienHO.value,
+                            ten: event.target.NhanvienTEN.value,
+                            //nguyenQuan: event.target.NhanvienNguyenQuan.value,
+                            tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
+                            ngaySinh: event.target.NhanvienNgaySinh.value,
+                            noiSinh: event.target.NhanvienNoiSinh.value,
+                            gioiTinh: event.target.NhanvienGIOITINH.value,
+                            hinhanh: this.state.url,
+                            diaChiThuongTru: event.target.NhanvienDiaChi.value,
+                            choOhienTai: event.target.NhanvienChoOHienTai.value,
+                            soCmnn: event.target.NhanvienSoCMNN.value,
+                            ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
+                            tonGiao: event.target.NhanvienTonGiao.value,
+                            noiCap: event.target.NhanvienNoiCap.value,
+                            quocTich: event.target.NhanvienQuocTich.value,
+                            email: event.target.NhanvienEmail.value,
+                            soDienThoai: event.target.NhanvienSDT.value,
+                            nganhHoc: null,
+                            noiDaoTao: null,
+                            //xepLoai: event.target.NhanvienXepLoai.value,
+                            //username
+                            idphongBan: parseInt(event.target.NhanvienPB.value),
+                            idchucVu: parseInt(event.target.NhanvienCV.value),
+                            //idquanHeGd
+                            ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
+                            trangthaiHdthuViec: null,
+                            trangthaiHdchinhThuc: null,
+                            iddanToc: parseInt(event.target.NhanvienDanToc.value),
+                            idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
+                            //idquyetDinhBn
+                        })
+                            //window.alert("Thành công")
+                            .then(() => {
+                                //alert('thanh cong');
+                                this.setState({ snackbaropen: true, snackbarmsg: "Thêm thành công" });
                             })
-                            //window.alert("Thành công")
-                            //window.alert("Thành công")
-                            //this.resetForm()
-                        } else {
-                            alert("VUI LÒNG KIỂM TRA LẠI!!!")
-                        }
+                        //this.resetForm()
+                    } else {
+                        //alert("VUI LÒNG KIỂM TRA LẠI!!!")
+                        //alert('thanh cong');
+                        this.setState({ snackbaropen: true, snackbarmsg: "VUI LÒNG KIỂM TRA LẠI!!!" });
                     }
+                }
                 //}
             }
         }

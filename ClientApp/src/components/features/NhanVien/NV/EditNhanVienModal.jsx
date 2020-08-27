@@ -221,11 +221,13 @@ export class EditNhanVienModal extends Component {
         let flagNgayCapCMND = true
         if (tinhTuoi < 18) { // chưa đủ tuổi đi làm
             flagTuoi = false
-            alert("Ngày sinh chưa hợp lệ. YÊU CẦU ỨNG VIÊN PHẢI TRÊN 18 Tuổi!!!")
+            //alert("Ngày sinh chưa hợp lệ. YÊU CẦU ỨNG VIÊN PHẢI TRÊN 18 Tuổi!!!")
+            this.setState({ snackbaropen: true, snackbarmsg: "Ngày sinh chưa hợp lệ" });
         } else {
             if (tinhNgayCapCMND < 14 || ktNgayCapVsNgayHienTai == 1) { // chưa đủ 14 tuổi & ngày cấp sau hiện tại 
                 flagNgayCapCMND = false
-                alert("Ngày cấp CMND chưa hợp lệ")
+                //alert("Ngày cấp CMND chưa hợp lệ")
+                this.setState({ snackbaropen: true, snackbarmsg: "Ngày cấp CMND chưa hợp lệ" });
             }
             // else {
             //     if (flagTruongPhong == true
@@ -233,113 +235,123 @@ export class EditNhanVienModal extends Component {
             //     ) {
             //         alert("Phòng ban này đã có trưởng phòng")
             //     }
-                else {
-                    // if (flagSoCMND == true) {
-                    //     alert("Số CMND đã bị trùng")
-                    // }
-                    // else {
-                    if ((flagTuoi == true && flagNgayCapCMND == true)
-                        && this.state.formErrors.NhanvienTEN == "." // thỏa tất cả mới đc submit
-                        && this.state.formErrors.NhanvienHO == "." // nếu không đỏ sẽ post đc
-                        && this.state.formErrors.NhanvienEmail == "."
-                        && this.state.formErrors.NhanvienSoCMNN == "."
-                        && this.state.formErrors.NhanvienSDT == "."
+            else {
+                // if (flagSoCMND == true) {
+                //     alert("Số CMND đã bị trùng")
+                // }
+                // else {
+                if ((flagTuoi == true && flagNgayCapCMND == true)
+                    && this.state.formErrors.NhanvienTEN == "." // thỏa tất cả mới đc submit
+                    && this.state.formErrors.NhanvienHO == "." // nếu không đỏ sẽ post đc
+                    && this.state.formErrors.NhanvienEmail == "."
+                    && this.state.formErrors.NhanvienSoCMNN == "."
+                    && this.state.formErrors.NhanvienSDT == "."
 
-                        && event.target.NhanvienTEN.value != "" // gõ đúng hết sau đó nhấn đóng
-                        && event.target.NhanvienHO.value != ""
-                        && event.target.NhanvienEmail.value != ""
-                        && event.target.NhanvienSoCMNN.value != ""
-                        && event.target.NhanvienSDT.value != ""
+                    && event.target.NhanvienTEN.value != "" // gõ đúng hết sau đó nhấn đóng
+                    && event.target.NhanvienHO.value != ""
+                    && event.target.NhanvienEmail.value != ""
+                    && event.target.NhanvienSoCMNN.value != ""
+                    && event.target.NhanvienSDT.value != ""
 
 
-                        && event.target.NhanvienTonGiao.value != ""
-                        && event.target.NhanvienNoiSinh.value != ""
-                        && event.target.NhanvienNoiCap.value != ""
-                        && event.target.NhanvienQuocTich.value != ""
-                        && event.target.NhanvienDiaChi.value != ""
-                        && event.target.NhanvienChoOHienTai.value != ""
-                        && event.target.NhanvienTinhTrangHonNhan.value != ""
+                    && event.target.NhanvienTonGiao.value != ""
+                    && event.target.NhanvienNoiSinh.value != ""
+                    && event.target.NhanvienNoiCap.value != ""
+                    && event.target.NhanvienQuocTich.value != ""
+                    && event.target.NhanvienDiaChi.value != ""
+                    && event.target.NhanvienChoOHienTai.value != ""
+                    && event.target.NhanvienTinhTrangHonNhan.value != ""
 
-                        && event.target.NhanvienNgaySinh.value != ""
-                        && event.target.NhanvienNgNgayCapCMMM.value != ""
-                    ) {
-                        if (this.state.url == "") {
-                            axios.put('https://localhost:44390/api/nhanviens/' + event.target.NhanvienID.value, {
-                                idnhanVien: parseInt(event.target.NhanvienID.value),
-                                hoDem: event.target.NhanvienHO.value,
-                                ten: event.target.NhanvienTEN.value,
-                                //nguyenQuan: event.target.NhanvienNguyenQuan.value,
-                                tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
-                                ngaySinh: event.target.NhanvienNgaySinh.value,
-                                noiSinh: event.target.NhanvienNoiSinh.value,
-                                gioiTinh: event.target.NhanvienGIOITINH.value,
-                                hinhAnh: this.props.nvpic,
-                                diaChiThuongTru: event.target.NhanvienDiaChi.value,
-                                choOhienTai: event.target.NhanvienChoOHienTai.value,
-                                soCmnn: event.target.NhanvienSoCMNN.value,
-                                ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
-                                tonGiao: event.target.NhanvienTonGiao.value,
-                                noiCap: event.target.NhanvienNoiCap.value,
-                                quocTich: event.target.NhanvienQuocTich.value,
-                                email: event.target.NhanvienEmail.value,
-                                soDienThoai: event.target.NhanvienSDT.value,
-                                nganhHoc: null,
-                                noiDaoTao: event.target.NhanvienNoiDaoTao.value,/////////
-                                //xepLoai: event.target.NhanvienXepLoai.value,
-                                username: this.props.nvusername,
-                                idphongBan: parseInt(event.target.NhanvienPB.value),
-                                idchucVu: parseInt(event.target.NhanvienCV.value),
-                                //idquanHeGd
-                                ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
-                                trangthaiHdthuViec: this.props.nvthuviec,
-                                trangthaiHdchinhThuc: this.props.nvchinhthuc,
-                                iddanToc: parseInt(event.target.NhanvienDanToc.value),
-                                idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
-                                idquyetDinhBn: this.props.nvqdbn,
-                            })
-                        }
-                        else {
-                            axios.put('https://localhost:44390/api/nhanviens/' + event.target.NhanvienID.value, {
-                                idnhanVien: parseInt(event.target.NhanvienID.value),
-                                hoDem: event.target.NhanvienHO.value,
-                                ten: event.target.NhanvienTEN.value,
-                                //nguyenQuan: event.target.NhanvienNguyenQuan.value,
-                                tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
-                                ngaySinh: event.target.NhanvienNgaySinh.value,
-                                noiSinh: event.target.NhanvienNoiSinh.value,
-                                gioiTinh: event.target.NhanvienGIOITINH.value,
-                                hinhAnh: this.state.url,
-                                diaChiThuongTru: event.target.NhanvienDiaChi.value,
-                                choOhienTai: event.target.NhanvienChoOHienTai.value,
-                                soCmnn: event.target.NhanvienSoCMNN.value,
-                                ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
-                                tonGiao: event.target.NhanvienTonGiao.value,
-                                noiCap: event.target.NhanvienNoiCap.value,
-                                quocTich: event.target.NhanvienQuocTich.value,
-                                email: event.target.NhanvienEmail.value,
-                                soDienThoai: event.target.NhanvienSDT.value,
-                                nganhHoc: null,
-                                noiDaoTao: event.target.NhanvienNoiDaoTao.value,/////////
-                                //xepLoai: event.target.NhanvienXepLoai.value,
-                                username: this.props.nvusername,
-                                idphongBan: parseInt(event.target.NhanvienPB.value),
-                                idchucVu: parseInt(event.target.NhanvienCV.value),
-                                //idquanHeGd
-                                ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
-                                trangthaiHdthuViec: this.props.nvthuviec,
-                                trangthaiHdchinhThuc: this.props.nvchinhthuc,
-                                iddanToc: parseInt(event.target.NhanvienDanToc.value),
-                                idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
-                                idquyetDinhBn: this.props.nvqdbn,
-                            })
-                        }
-                        alert("Sửa thành công ")
-                        this.resetForm()
-                    } else {
-                        alert("VUI LÒNG KIỂM TRA LẠI!!!")
+                    && event.target.NhanvienNgaySinh.value != ""
+                    && event.target.NhanvienNgNgayCapCMMM.value != ""
+                ) {
+                    if (this.state.url == "") {
+                        axios.put('https://localhost:44390/api/nhanviens/' + event.target.NhanvienID.value, {
+                            idnhanVien: parseInt(event.target.NhanvienID.value),
+                            hoDem: event.target.NhanvienHO.value,
+                            ten: event.target.NhanvienTEN.value,
+                            //nguyenQuan: event.target.NhanvienNguyenQuan.value,
+                            tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
+                            ngaySinh: event.target.NhanvienNgaySinh.value,
+                            noiSinh: event.target.NhanvienNoiSinh.value,
+                            gioiTinh: event.target.NhanvienGIOITINH.value,
+                            hinhAnh: this.props.nvpic,
+                            diaChiThuongTru: event.target.NhanvienDiaChi.value,
+                            choOhienTai: event.target.NhanvienChoOHienTai.value,
+                            soCmnn: event.target.NhanvienSoCMNN.value,
+                            ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
+                            tonGiao: event.target.NhanvienTonGiao.value,
+                            noiCap: event.target.NhanvienNoiCap.value,
+                            quocTich: event.target.NhanvienQuocTich.value,
+                            email: event.target.NhanvienEmail.value,
+                            soDienThoai: event.target.NhanvienSDT.value,
+                            nganhHoc: null,
+                            noiDaoTao: event.target.NhanvienNoiDaoTao.value,/////////
+                            //xepLoai: event.target.NhanvienXepLoai.value,
+                            username: this.props.nvusername,
+                            idphongBan: parseInt(event.target.NhanvienPB.value),
+                            idchucVu: parseInt(event.target.NhanvienCV.value),
+                            //idquanHeGd
+                            ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
+                            trangthaiHdthuViec: this.props.nvthuviec,
+                            trangthaiHdchinhThuc: this.props.nvchinhthuc,
+                            iddanToc: parseInt(event.target.NhanvienDanToc.value),
+                            idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
+                            idquyetDinhBn: this.props.nvqdbn,
+                        })
+                        .then(() => {
+                            //alert('thanh cong');
+                            this.setState({ snackbaropen: true, snackbarmsg: "Sửa thành công" });
+                        })
                     }
-                    //}
+                    else {
+                        axios.put('https://localhost:44390/api/nhanviens/' + event.target.NhanvienID.value, {
+                            idnhanVien: parseInt(event.target.NhanvienID.value),
+                            hoDem: event.target.NhanvienHO.value,
+                            ten: event.target.NhanvienTEN.value,
+                            //nguyenQuan: event.target.NhanvienNguyenQuan.value,
+                            tinhTrangHonNhan: event.target.NhanvienTinhTrangHonNhan.value,
+                            ngaySinh: event.target.NhanvienNgaySinh.value,
+                            noiSinh: event.target.NhanvienNoiSinh.value,
+                            gioiTinh: event.target.NhanvienGIOITINH.value,
+                            hinhAnh: this.state.url,
+                            diaChiThuongTru: event.target.NhanvienDiaChi.value,
+                            choOhienTai: event.target.NhanvienChoOHienTai.value,
+                            soCmnn: event.target.NhanvienSoCMNN.value,
+                            ngayCap: event.target.NhanvienNgNgayCapCMMM.value,
+                            tonGiao: event.target.NhanvienTonGiao.value,
+                            noiCap: event.target.NhanvienNoiCap.value,
+                            quocTich: event.target.NhanvienQuocTich.value,
+                            email: event.target.NhanvienEmail.value,
+                            soDienThoai: event.target.NhanvienSDT.value,
+                            nganhHoc: null,
+                            noiDaoTao: event.target.NhanvienNoiDaoTao.value,/////////
+                            //xepLoai: event.target.NhanvienXepLoai.value,
+                            username: this.props.nvusername,
+                            idphongBan: parseInt(event.target.NhanvienPB.value),
+                            idchucVu: parseInt(event.target.NhanvienCV.value),
+                            //idquanHeGd
+                            ////trangThaiHoSo=> trangthaiHDThuViec, trangthaiHDChinhThuc,
+                            trangthaiHdthuViec: this.props.nvthuviec,
+                            trangthaiHdchinhThuc: this.props.nvchinhthuc,
+                            iddanToc: parseInt(event.target.NhanvienDanToc.value),
+                            idtrinhDo: parseInt(event.target.NhanvienTrinhDoDaoTao.value),
+                            idquyetDinhBn: this.props.nvqdbn,
+                        })
+                        .then(() => {
+                            //alert('thanh cong');
+                            this.setState({ snackbaropen: true, snackbarmsg: "Sửa thành công" });
+                        })
+                    }
+                    //alert("Sửa thành công ")
+                    
+                    //this.resetForm()
+                } else {
+                    //alert("VUI LÒNG KIỂM TRA LẠI!!!")
+                    this.setState({ snackbaropen: true, snackbarmsg: "VUI LÒNG KIỂM TRA LẠI!!!" });
                 }
+                //}
+            }
             //}
 
         }

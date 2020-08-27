@@ -14,6 +14,9 @@ import PrintIcon from '@material-ui/icons/Print';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import { format } from 'date-fns'
 
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+
 import { EditNhanVienModal } from './EditNhanVienModal'
 import { ShowNhanVienModal } from './ShowNhanVienModal'
 import { InNhanVienModal } from './InNhanVienModal'
@@ -57,8 +60,11 @@ export class AppNhanVien extends Component {
             pbs: [],
             nhanviens: [],
             ungviens: [],
-            chonPB: '',
-            chonRadio: "Đã ký",
+            chonPB: 2,
+            chonRadio: "Chưa ký",
+
+            snackbaropen: false,
+            snackbarmsg: '',
 
             addModalShow: false,
             editModalShow: false,
@@ -67,6 +73,10 @@ export class AppNhanVien extends Component {
         this.handleChange = this.handleChange.bind(this)
         this.handleChangeCheck = this.handleChangeCheck.bind(this)
     }
+
+    SnackbarClose = (event) => {
+        this.setState({ snackbaropen: false });
+    };
 
     componentDidMount() {
         this.loadNV()
@@ -78,7 +88,7 @@ export class AppNhanVien extends Component {
     }
 
     componentDidUpdate() {
-        this.loadNV()
+        //this.loadNV()
         //this.loadPB()
     }
 
@@ -179,7 +189,7 @@ export class AppNhanVien extends Component {
 
     /****** Xóa nv chưa ký hđ *************************************************/
     xoaNV(idnv) { // Xóa nv chưa ký hđ chính thức
-        if (window.confirm('Bạn có chắc muốn xóa?')) {
+        //if (window.confirm('Bạn có chắc muốn xóa?')) {
             fetch('https://localhost:44390/api/nhanviens/' + idnv, {
                 method: 'DELETE',
                 headers: {
@@ -187,8 +197,12 @@ export class AppNhanVien extends Component {
                     'Content-Type': 'application/json'
                 }
             })
-            alert("Xóa thành công")
-        }
+            //alert("Xóa thành công")
+            //.then(() => {
+                //alert('thanh cong');
+                this.setState({ snackbaropen: true, snackbarmsg: "Xóa thành công" });
+            //})
+        //}
     }
 
     xoaNVvaQDBNsuaUV(idnv, idqd, iduv) { // Xóa nv chưa ký hđ thử việc
@@ -1066,6 +1080,19 @@ export class AppNhanVien extends Component {
                 <div className="container text-center">
                     <h1 className="display-7">DANH SÁCH NHÂN VIÊN</h1><hr />
                 </div>
+
+                <Snackbar
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    open={this.state.snackbaropen}
+                    autoHideDuration={3000}
+                    onClose={this.SnackbarClose}
+                    message={<span id="message-id">{this.state.snackbarmsg}</span>}
+                    action={[
+                        <IconButton key="close" arial-label="Close" color="inherit" onClick={this.SnackbarClose}>
+                            x
+                        </IconButton>
+                    ]}
+                />
 
                 <Row>
                     <Col sm={4}>
